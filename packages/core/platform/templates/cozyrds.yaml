@@ -161,7 +161,7 @@ spec:
     category: PaaS
     singular: "Managed LLM"
     plural: "Managed LLM models"
-    description: "GPU-accelerated LLM inference with vLLM — OpenAI-compatible API, PagedAttention, multi-GPU support"
+    description: "Managed LLM inference service"
     tags:
       - ai
       - llm
