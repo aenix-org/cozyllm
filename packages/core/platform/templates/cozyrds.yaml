@@ -159,8 +159,8 @@ spec:
     prefix: vllm-inference-
   dashboard:
     category: ai
-    singular: "LLM Inference"
-    plural: "LLM Inferences"
+    singular: "Managed LLM"
+    plural: "Managed LLM models"
     description: "GPU-accelerated LLM inference with vLLM — OpenAI-compatible API, PagedAttention, multi-GPU support"
     tags:
       - ai
