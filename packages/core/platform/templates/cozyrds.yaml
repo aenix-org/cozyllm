@@ -158,7 +158,7 @@ spec:
       cozystack.io/ui: "true"
     prefix: vllm-inference-
   dashboard:
-    category: ai
+    category: PaaS
     singular: "Managed LLM"
     plural: "Managed LLM models"
     description: "GPU-accelerated LLM inference with vLLM — OpenAI-compatible API, PagedAttention, multi-GPU support"
