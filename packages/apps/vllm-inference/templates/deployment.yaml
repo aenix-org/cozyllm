@@ -102,6 +102,8 @@ spec:
               nvidia.com/gpu: {{ .Values.gpuCount }}
               {{- end }}
             limits:
+              cpu: {{ default "4" .Values.resources.cpu | quote }}
+              memory: {{ default "16Gi" .Values.resources.memory | quote }}
               {{- if .Values.gpuEnabled }}
               nvidia.com/gpu: {{ .Values.gpuCount }}
               {{- end }}
