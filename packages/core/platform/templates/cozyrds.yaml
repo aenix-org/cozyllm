@@ -42,6 +42,7 @@ spec:
             "type": "integer",
             "title": "GPU Count",
             "description": "Number of GPUs (tensor parallelism)",
+            "default": 1,
             "enum": [1, 2, 4, 8],
             "x-cozy-widget": "select",
             "x-cozy-options": [
@@ -68,6 +69,7 @@ spec:
             "type": "integer",
             "title": "Max Context Length",
             "description": "Maximum number of tokens in a single request (prompt + completion)",
+            "default": 8192,
             "enum": [4096, 8192, 16384, 32768, 65536, 131072],
             "x-cozy-widget": "select",
             "x-cozy-options": [
@@ -144,6 +146,7 @@ spec:
             "type": "integer",
             "title": "Replicas",
             "description": "Number of inference pods (usually 1 - vLLM is stateful)",
+            "default": 1,
             "minimum": 1,
             "maximum": 8
           }
