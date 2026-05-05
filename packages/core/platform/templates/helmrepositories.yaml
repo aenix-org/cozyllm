@@ -1,0 +1,2 @@
+# No external HelmRepositories required.
+# vllm-inference chart is sourced directly from the cozyllm GitRepository.

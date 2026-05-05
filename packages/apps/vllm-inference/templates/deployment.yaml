@@ -1,0 +1,95 @@
+{{- $quantFlag := "" }}
+{{- if ne .Values.quantization "fp16" }}
+  {{- $quantFlag = printf "--quantization %s" .Values.quantization }}
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vllm-inference.fullname" . }}
+  labels:
+    {{- include "vllm-inference.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "vllm-inference.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "vllm-inference.selectorLabels" . | nindent 8 }}
+    spec:
+      # GPU nodes typically carry this taint
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: vllm
+          image: "vllm/vllm-openai:v{{ .Chart.AppVersion }}"
+          imagePullPolicy: IfNotPresent
+          args:
+            - "--model"
+            - {{ .Values.model | quote }}
+            - "--tensor-parallel-size"
+            - {{ .Values.gpuCount | quote }}
+            - "--max-model-len"
+            - {{ .Values.maxContextLength | quote }}
+            - "--served-model-name"
+            - {{ .Values.model | quote }}
+            {{- if ne .Values.quantization "fp16" }}
+            - "--quantization"
+            - {{ .Values.quantization | quote }}
+            {{- end }}
+            {{- if .Values.apiKey }}
+            - "--api-key"
+            - "$(VLLM_API_KEY)"
+            {{- end }}
+          env:
+            - name: HF_HOME
+              value: /data/hf_cache
+            {{- if .Values.huggingfaceToken }}
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "vllm-inference.fullname" . }}-hf-token
+                  key: token
+            {{- end }}
+            {{- if .Values.apiKey }}
+            - name: VLLM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "vllm-inference.fullname" . }}-api-key
+                  key: key
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 30
+          resources:
+            requests:
+              cpu: {{ default "4" .Values.resources.cpu | quote }}
+              memory: {{ default "16Gi" .Values.resources.memory | quote }}
+              nvidia.com/gpu: {{ .Values.gpuCount }}
+            limits:
+              nvidia.com/gpu: {{ .Values.gpuCount }}
+          volumeMounts:
+            - name: model-cache
+              mountPath: /data
+      volumes:
+        - name: model-cache
+          persistentVolumeClaim:
+            claimName: {{ include "vllm-inference.fullname" . }}-model-cache

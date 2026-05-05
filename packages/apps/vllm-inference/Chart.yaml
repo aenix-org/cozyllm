@@ -1,0 +1,15 @@
+apiVersion: v2
+name: vllm-inference
+description: Production LLM inference with vLLM — GPU-accelerated, OpenAI-compatible API
+type: application
+version: 0.1.0
+appVersion: "0.6.6"
+keywords:
+  - llm
+  - vllm
+  - gpu
+  - inference
+  - ai
+home: https://github.com/aenix-io/cozyllm
+sources:
+  - https://github.com/vllm-project/vllm

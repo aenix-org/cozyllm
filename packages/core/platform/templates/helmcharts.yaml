@@ -1,0 +1,14 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmChart
+metadata:
+  name: cozyllm-vllm-inference
+  namespace: cozy-public
+spec:
+  chart: ./packages/apps/vllm-inference
+  interval: 1m
+  reconcileStrategy: Revision
+  sourceRef:
+    kind: GitRepository
+    name: cozyllm
+    namespace: cozy-public
