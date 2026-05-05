@@ -35,7 +35,7 @@ apiKey: ""
 
 # Persistent volume for cached model weights
 storage:
-  size: "100Gi"
+  size: "50Gi"
   # storageClass: "" # leave empty to use cluster default
 
 # Ingress — expose the OpenAI-compatible API externally

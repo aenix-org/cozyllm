@@ -94,7 +94,7 @@
           "type": "string",
           "title": "Model Cache Size",
           "description": "PVC size for downloaded model weights",
-          "default": "100Gi",
+          "default": "50Gi",
           "pattern": "^[0-9]+(Mi|Gi|Ti)$",
           "x-cozy-widget": "select",
           "enum": ["50Gi", "100Gi", "200Gi", "500Gi"],

@@ -105,7 +105,7 @@ spec:
                 "type": "string",
                 "title": "Model Cache Size",
                 "description": "PVC size for downloaded model weights",
-                "default": "100Gi",
+                "default": "50Gi",
                 "enum": ["50Gi", "100Gi", "200Gi", "500Gi"],
                 "x-cozy-widget": "select",
                 "x-cozy-options": [
