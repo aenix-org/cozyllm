@@ -1,0 +1,11 @@
+{{- if .Values.modelCache.s3.enabled }}
+# Shared S3 bucket for model weight caching across instances and restarts.
+# Provisioned via Cozystack bucket service — credentials appear as Secret
+# "bucket-<release>-models-credentials" once the HelmRelease reconciles.
+apiVersion: apps.cozystack.io/v1alpha1
+kind: Bucket
+metadata:
+  name: {{ include "vllm-inference.fullname" . }}-models
+  namespace: {{ .Release.Namespace }}
+spec: {}
+{{- end }}

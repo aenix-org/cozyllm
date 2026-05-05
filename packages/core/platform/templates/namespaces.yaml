@@ -1,8 +1,14 @@
 ---
-# Runtime namespace for deployed vllm-inference instances
 apiVersion: v1
 kind: Namespace
 metadata:
   name: cozy-vllm-inference
+  labels:
+    cozystack.io/managed: "true"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cozy-litellm
   labels:
     cozystack.io/managed: "true"

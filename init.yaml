@@ -9,7 +9,9 @@ spec:
   ref:
     branch: main
   timeout: 60s
-  url: https://github.com/aenix-org/cozyllm.git
+  url: ssh://git@github.com/aenix-org/cozyllm.git
+  secretRef:
+    name: cozyllm-deploy-key
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

@@ -201,3 +201,99 @@ spec:
         - resources
       - - spec
         - replicaCount
+---
+apiVersion: cozystack.io/v1alpha1
+kind: ApplicationDefinition
+metadata:
+  name: litellm
+spec:
+  application:
+    kind: Litellm
+    plural: litellms
+    singular: litellm
+    openAPISchema: |
+      {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "required": ["masterKey"],
+        "properties": {
+          "masterKey": {
+            "type": "string",
+            "title": "Master API Key",
+            "description": "Admin key. All clients use this or virtual keys derived from it.",
+            "x-cozy-widget": "password",
+            "x-cozy-sensitive": true
+          },
+          "models": {
+            "type": "array",
+            "title": "LLM Backends",
+            "description": "vLLM instances to proxy. URL pattern: http://<release>.<namespace>.svc.cluster.local:8000",
+            "default": [],
+            "items": {
+              "type": "object",
+              "required": ["name", "url"],
+              "properties": {
+                "name": {"type": "string", "title": "Model name"},
+                "url":  {"type": "string", "title": "vLLM service URL"},
+                "apiKey": {"type": "string", "title": "API Key (optional)"}
+              }
+            }
+          },
+          "postgres": {
+            "type": "object",
+            "title": "PostgreSQL",
+            "properties": {
+              "enabled":  {"type": "boolean", "title": "Enable managed Postgres", "default": true},
+              "replicas": {"type": "integer", "title": "Replicas", "default": 1, "minimum": 1, "maximum": 3}
+            }
+          },
+          "host": {
+            "type": "string",
+            "title": "Hostname",
+            "description": "Expose via Ingress. Leave empty for cluster-internal only.",
+            "pattern": "^$|^[a-z0-9][a-z0-9\\-\\.]+[a-z0-9]$"
+          },
+          "replicaCount": {
+            "type": "integer",
+            "title": "Replicas",
+            "default": 1,
+            "minimum": 1,
+            "maximum": 5
+          }
+        }
+      }
+  release:
+    chartRef:
+      kind: HelmChart
+      name: cozyllm-litellm
+      namespace: cozy-public
+    labels:
+      cozystack.io/ui: "true"
+    prefix: litellm-
+  dashboard:
+    category: PaaS
+    singular: "LLM Gateway"
+    plural: "LLM Gateways"
+    description: "Managed LiteLLM gateway service"
+    tags:
+      - ai
+      - llm
+      - gateway
+      - litellm
+    icon: PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+CiAgPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHJ4PSIxNiIgZmlsbD0iIzBmMTcyYSIvPgogIDxjaXJjbGUgY3g9IjUwIiBjeT0iNDIiIHI9IjE4IiBmaWxsPSJub25lIiBzdHJva2U9IiM2MzY2ZjEiIHN0cm9rZS13aWR0aD0iMyIvPgogIDxsaW5lIHgxPSIzMCIgeTE9IjY4IiB4Mj0iNzAiIHkyPSI2OCIgc3Ryb2tlPSIjNjM2NmYxIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxsaW5lIHgxPSIzOCIgeTE9Ijc4IiB4Mj0iNjIiIHkyPSI3OCIgc3Ryb2tlPSIjNjM2NmYxIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iMC42Ii8+CiAgPGxpbmUgeDE9IjUwIiB5MT0iMjQiIHgyPSI1MCIgeTI9IjM0IiBzdHJva2U9IiNhNWI0ZmMiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxsaW5lIHgxPSI1MCIgeTE9IjUwIiB4Mj0iNTAiIHkyPSI2MCIgc3Ryb2tlPSIjYTViNGZjIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8bGluZSB4MT0iMzIiIHkxPSIzMyIgeDI9IjQwIiB5Mj0iMzgiIHN0cm9rZT0iI2E1YjRmYyIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPGxpbmUgeDE9IjY4IiB5MT0iMzMiIHgyPSI2MCIgeTI9IjM4IiBzdHJva2U9IiNhNWI0ZmMiIHN0cm9rZS13aWR0aD0iMiIvPgo8L3N2Zz4K
+    keysOrder:
+      - - apiVersion
+      - - kind
+      - - metadata
+      - - metadata
+        - name
+      - - spec
+        - masterKey
+      - - spec
+        - models
+      - - spec
+        - postgres
+      - - spec
+        - host
+      - - spec
+        - replicaCount

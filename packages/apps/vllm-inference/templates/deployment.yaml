@@ -1,13 +1,11 @@
-{{- $quantFlag := "" }}
-{{- if ne .Values.quantization "fp16" }}
-  {{- $quantFlag = printf "--quantization %s" .Values.quantization }}
-{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "vllm-inference.fullname" . }}
   labels:
     {{- include "vllm-inference.labels" . | nindent 4 }}
+    cozyllm.io/model: "true"
+    cozyllm.io/model-name: {{ .Values.model | replace "/" "-" | lower | trunc 63 | trimSuffix "-" | quote }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -17,12 +15,117 @@ spec:
     metadata:
       labels:
         {{- include "vllm-inference.selectorLabels" . | nindent 8 }}
+        cozyllm.io/model: "true"
     spec:
-      # GPU nodes typically carry this taint
       tolerations:
         - key: nvidia.com/gpu
           operator: Exists
           effect: NoSchedule
+      initContainers:
+        - name: model-prefetch
+          image: "vllm/vllm-openai:v{{ .Chart.AppVersion }}"
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -e
+              MODEL_SLUG=$(echo "$MODEL" | tr '/' '--')
+              SNAP_DIR="$HF_HOME/hub/models--$MODEL_SLUG/snapshots"
+
+              # Fast path: model already in local PVC cache
+              if [ -d "$SNAP_DIR" ] && ls "$SNAP_DIR" 2>/dev/null | grep -q .; then
+                echo "Model $MODEL already cached locally, skipping download"
+                exit 0
+              fi
+
+              {{- if .Values.modelCache.s3.enabled }}
+              # Try restoring from shared S3 cache (datacenter-local, fast)
+              echo "Checking S3 cache for $MODEL..."
+              pip install boto3 -q --no-cache-dir
+              python3 -c "
+              import boto3, os, sys
+              s3 = boto3.client('s3',
+                endpoint_url=os.environ['S3_ENDPOINT'],
+                aws_access_key_id=os.environ['S3_ACCESS_KEY'],
+                aws_secret_access_key=os.environ['S3_SECRET_KEY'])
+              bucket = os.environ['S3_BUCKET']
+              model = os.environ['MODEL']
+              prefix = 'models/' + model + '/'
+              resp = s3.list_objects_v2(Bucket=bucket, Prefix=prefix, MaxKeys=1)
+              if resp.get('KeyCount', 0) > 0:
+                  print('Found in S3, syncing...')
+                  import subprocess
+                  subprocess.run(['aws', 's3', 'sync',
+                      's3://' + bucket + '/' + prefix,
+                      os.environ['HF_HOME'] + '/hub/models--' + model.replace('/', '--') + '/snapshots/main/',
+                      '--endpoint-url', os.environ['S3_ENDPOINT'],
+                      '--quiet'], check=True)
+                  sys.exit(0)
+              print('Not in S3, will download from HuggingFace')
+              sys.exit(1)
+              " && exit 0 || true
+              {{- end }}
+
+              # Download from HuggingFace
+              echo "Downloading $MODEL from HuggingFace (this may take a while)..."
+              huggingface-cli download "$MODEL" --cache-dir "$HF_HOME/hub" --quiet
+              echo "Download complete"
+
+              {{- if .Values.modelCache.s3.enabled }}
+              # Upload to shared S3 cache for future instances
+              echo "Uploading to S3 cache..."
+              pip install boto3 -q --no-cache-dir 2>/dev/null || true
+              python3 -c "
+              import boto3, os, subprocess
+              bucket = os.environ['S3_BUCKET']
+              model = os.environ['MODEL']
+              src = os.environ['HF_HOME'] + '/hub/models--' + model.replace('/', '--') + '/'
+              dst = 's3://' + bucket + '/models/' + model + '/'
+              subprocess.run(['aws', 's3', 'sync', src, dst,
+                  '--endpoint-url', os.environ['S3_ENDPOINT'], '--quiet'], check=True)
+              print('S3 upload complete')
+              "
+              {{- end }}
+          env:
+            - name: MODEL
+              value: {{ .Values.model | quote }}
+            - name: HF_HOME
+              value: /data/hf_cache
+            {{- if .Values.huggingfaceToken }}
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "vllm-inference.fullname" . }}-hf-token
+                  key: token
+            {{- end }}
+            {{- if .Values.modelCache.s3.enabled }}
+            - name: S3_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: bucket-{{ include "vllm-inference.fullname" . }}-models-credentials
+                  key: endpoint
+            - name: S3_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: bucket-{{ include "vllm-inference.fullname" . }}-models-credentials
+                  key: bucketName
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: bucket-{{ include "vllm-inference.fullname" . }}-models-credentials
+                  key: accessKey
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: bucket-{{ include "vllm-inference.fullname" . }}-models-credentials
+                  key: secretKey
+            {{- end }}
+          volumeMounts:
+            - name: model-cache
+              mountPath: /data
+          resources:
+            requests:
+              cpu: "2"
+              memory: "8Gi"
       containers:
         - name: vllm
           image: "vllm/vllm-openai:v{{ .Chart.AppVersion }}"
@@ -36,6 +139,8 @@ spec:
             - {{ .Values.maxContextLength | quote }}
             - "--served-model-name"
             - {{ .Values.model | quote }}
+            - "--load-format"
+            - "auto"
             {{- if ne .Values.quantization "fp16" }}
             - "--quantization"
             - {{ .Values.quantization | quote }}
@@ -69,14 +174,14 @@ spec:
             httpGet:
               path: /health
               port: http
-            initialDelaySeconds: 120
+            initialDelaySeconds: 60
             periodSeconds: 30
             failureThreshold: 5
           readinessProbe:
             httpGet:
               path: /health
               port: http
-            initialDelaySeconds: 60
+            initialDelaySeconds: 30
             periodSeconds: 10
             failureThreshold: 30
           resources:
