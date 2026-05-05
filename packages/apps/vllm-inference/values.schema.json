@@ -7,6 +7,7 @@
       "type": "string",
       "title": "Model",
       "description": "HuggingFace model ID to deploy",
+      "default": "Qwen/Qwen2.5-7B-Instruct",
       "enum": [
         "meta-llama/Llama-3.1-8B-Instruct",
         "meta-llama/Llama-3.1-70B-Instruct",
@@ -45,6 +46,7 @@
       "type": "string",
       "title": "Quantization",
       "description": "Numerical precision. fp16 = best quality, awq/gptq = less VRAM",
+      "default": "fp16",
       "enum": ["fp16", "fp8", "awq", "gptq"],
       "x-cozy-widget": "select",
       "x-cozy-options": [
@@ -92,6 +94,7 @@
           "type": "string",
           "title": "Model Cache Size",
           "description": "PVC size for downloaded model weights",
+          "default": "100Gi",
           "pattern": "^[0-9]+(Mi|Gi|Ti)$",
           "x-cozy-widget": "select",
           "enum": ["50Gi", "100Gi", "200Gi", "500Gi"],
