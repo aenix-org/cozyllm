@@ -152,6 +152,12 @@ spec:
             "default": 1,
             "minimum": 1,
             "maximum": 8
+          },
+          "gpuEnabled": {
+            "type": "boolean",
+            "title": "GPU Enabled",
+            "description": "Set to false for CPU-only mode (very slow, for testing only)",
+            "default": true
           }
         }
       }

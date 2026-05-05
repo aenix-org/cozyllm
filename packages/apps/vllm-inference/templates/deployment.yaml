@@ -17,10 +17,12 @@ spec:
         {{- include "vllm-inference.selectorLabels" . | nindent 8 }}
         cozyllm.io/model: "true"
     spec:
+      {{- if .Values.gpuEnabled }}
       tolerations:
         - key: nvidia.com/gpu
           operator: Exists
           effect: NoSchedule
+      {{- end }}
       containers:
         - name: vllm
           image: "vllm/vllm-openai:v{{ .Chart.AppVersion }}"
@@ -96,9 +98,13 @@ spec:
             requests:
               cpu: {{ default "4" .Values.resources.cpu | quote }}
               memory: {{ default "16Gi" .Values.resources.memory | quote }}
+              {{- if .Values.gpuEnabled }}
               nvidia.com/gpu: {{ .Values.gpuCount }}
+              {{- end }}
             limits:
+              {{- if .Values.gpuEnabled }}
               nvidia.com/gpu: {{ .Values.gpuCount }}
+              {{- end }}
           volumeMounts:
             - name: model-cache
               mountPath: /data
