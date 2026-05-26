@@ -1,0 +1,24 @@
+HolmesGPT release {{ .Release.Name }} created.
+
+The pod is stateless; it pulls cluster state through its ServiceAccount
+(read-only ClusterRole created by the upstream chart) and calls the
+configured LLM endpoint for analysis.
+
+Watch progress:
+
+  kubectl -n {{ .Release.Namespace }} get pod -l app.kubernetes.io/instance={{ .Release.Name }}-app
+
+Use:
+
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ .Release.Name }}-app-holmes 8000:80
+  curl -s -X POST http://localhost:8000/api/chat \
+    -H 'Content-Type: application/json' \
+    -d '{"ask":"List unhealthy pods across all namespaces"}'
+
+Common failures:
+  - Pod Pending: insufficient capacity on any node (Holmes is light: ~500m CPU,
+    ~1 GiB memory).
+  - 401/403 in API responses: spec.openaiApiKey is empty or invalid for the
+    configured spec.openaiBaseUrl. Patch the CR with valid credentials.
+  - "model not found" in API responses: spec.model is not registered with the
+    LiteLLM gateway pointed to by spec.openaiBaseUrl.

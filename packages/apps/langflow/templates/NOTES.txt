@@ -1,0 +1,21 @@
+Langflow release {{ .Release.Name }} created.
+
+First start waits for sibling Postgres CR (3-5 min). The upstream chart
+runs database migrations on first start, so the pod may take an extra
+minute to become Ready after Postgres is up.
+
+Watch progress:
+
+  kubectl -n {{ .Release.Namespace }} get helmreleases | grep {{ .Release.Name }}
+  kubectl -n {{ .Release.Namespace }} get pod -l app.kubernetes.io/instance={{ .Release.Name }}-app
+
+Access once Ready (no auth by default — Langflow has anonymous mode):
+
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ .Release.Name }}-app 7860:80
+  open http://localhost:7860
+
+Common failures:
+  - Pod stuck on "waiting for postgres": sibling Postgres reconciliation
+    incomplete; check postgres-{{ .Release.Name }}-db HelmRelease.
+  - Migrations failing: the langflow user lacks privileges on the langflow
+    database. spec.database.user must match the user the chart creates.
