@@ -1,2 +1,11 @@
 # No external HelmRepositories required.
 # vllm-inference chart is sourced directly from the cozyllm GitRepository.
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: jupyterhub
+  namespace: external-jupyterhub
+spec:
+  interval: 5m
+  url: https://jupyterhub.github.io/helm-chart/

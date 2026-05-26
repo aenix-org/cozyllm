@@ -429,3 +429,115 @@ spec:
         - storageClass
       - - spec
         - replicaCount
+---
+apiVersion: cozystack.io/v1alpha1
+kind: ApplicationDefinition
+metadata:
+  name: jupyterhub
+spec:
+  application:
+    kind: JupyterHub
+    plural: jupyterhubs
+    singular: jupyterhub
+    openAPISchema: |
+      {
+        "title": "Chart Values",
+        "type": "object",
+        "properties": {
+          "host": {
+            "description": "Hostname for external access via Ingress. Leave empty to skip Ingress.",
+            "type": "string",
+            "default": ""
+          },
+          "storageClass": {
+            "description": "StorageClass for the managed Postgres PVCs. Leave empty to use cluster default.",
+            "type": "string",
+            "default": ""
+          },
+          "database": {
+            "description": "PostgreSQL configuration.",
+            "type": "object",
+            "default": {},
+            "required": [
+              "name",
+              "replicas",
+              "size",
+              "user"
+            ],
+            "properties": {
+              "name": {
+                "description": "Database name JupyterHub stores its state in.",
+                "type": "string",
+                "default": "jupyterhub"
+              },
+              "password": {
+                "description": "Optional explicit password. When empty, the cozystack postgres chart generates and preserves one via lookup.",
+                "type": "string",
+                "default": ""
+              },
+              "replicas": {
+                "description": "Number of database instances.",
+                "type": "integer",
+                "default": 2
+              },
+              "size": {
+                "description": "Persistent Volume size for database storage.",
+                "default": "5Gi",
+                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ],
+                "x-kubernetes-int-or-string": true
+              },
+              "user": {
+                "description": "Database user JupyterHub connects as.",
+                "type": "string",
+                "default": "jupyterhub"
+              }
+            }
+          },
+          "replicaCount": {
+            "description": "Number of JupyterHub hub pods. Usually 1 — multi-replica hub requires sticky sessions which the upstream chart does not configure by default.",
+            "type": "integer",
+            "default": 1
+          }
+        }
+      }
+  release:
+    chartRef:
+      kind: HelmChart
+      name: cozyllm-jupyterhub
+      namespace: cozy-public
+    labels:
+      cozystack.io/ui: "true"
+    prefix: jupyterhub-
+  dashboard:
+    category: PaaS
+    singular: "JupyterHub"
+    plural: "JupyterHubs"
+    description: "Multi-user JupyterHub notebooks with managed Postgres"
+    tags:
+      - ai
+      - ml
+      - notebook
+      - jupyter
+    icon: PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+CiAgPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHJ4PSIxNiIgZmlsbD0iIzFhMWEyZSIvPgogIDxwYXRoIGQ9Ik0gMjIgNTUgUSA1MCA4MCA3OCA1NSIgc3Ryb2tlPSIjZjM3NzI2IiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0gMjIgNDUgUSA1MCAyMCA3OCA0NSIgc3Ryb2tlPSIjZjM3NzI2IiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iMC41Ii8+CiAgPGNpcmNsZSBjeD0iNTAiIGN5PSIzNSIgcj0iNyIgZmlsbD0iI2YzNzcyNiIvPgogIDxjaXJjbGUgY3g9IjMwIiBjeT0iNjUiIHI9IjciIGZpbGw9IiNmMzc3MjYiLz4KICA8Y2lyY2xlIGN4PSI3MCIgY3k9IjY1IiByPSI3IiBmaWxsPSIjZjM3NzI2Ii8+Cjwvc3ZnPgo=
+    keysOrder:
+      - - apiVersion
+      - - kind
+      - - metadata
+      - - metadata
+        - name
+      - - spec
+        - database
+      - - spec
+        - host
+      - - spec
+        - storageClass
+      - - spec
+        - replicaCount
