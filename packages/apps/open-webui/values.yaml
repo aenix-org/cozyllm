@@ -28,6 +28,21 @@ database:
   password: ""
 
 ##
+## @section Vector DB (optional, for RAG over documents)
+##
+
+## @typedef {struct} Qdrant - Optional Qdrant vector store managed via the cozystack `Qdrant` sibling CR. When disabled, Open WebUI falls back to its embedded ChromaDB.
+## @field {bool} enabled - Provision a sibling Qdrant CR and point Open WebUI at it via VECTOR_DB + QDRANT_URI.
+## @field {quantity} size - Persistent Volume size for Qdrant storage.
+## @field {int} replicas - Number of Qdrant replicas.
+
+## @param {Qdrant} qdrant - Optional Qdrant vector store.
+qdrant:
+  enabled: false
+  size: 10Gi
+  replicas: 1
+
+##
 ## @section LLM backend
 ##
 

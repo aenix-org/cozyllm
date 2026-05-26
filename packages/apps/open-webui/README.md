@@ -42,6 +42,16 @@ A Pattern C Qdrant CR can be provisioned by adding `templates/qdrant.yaml` model
 | `database.password` | Optional explicit password. When empty, the cozystack postgres chart generates and preserves one via lookup. | `string`   | `""`        |
 
 
+### Vector DB (optional, for RAG over documents)
+
+| Name              | Description                                                                          | Type       | Value   |
+| ----------------- | ------------------------------------------------------------------------------------ | ---------- | ------- |
+| `qdrant`          | Optional Qdrant vector store.                                                        | `object`   | `{}`    |
+| `qdrant.enabled`  | Provision a sibling Qdrant CR and point Open WebUI at it via VECTOR_DB + QDRANT_URI. | `bool`     | `false` |
+| `qdrant.size`     | Persistent Volume size for Qdrant storage.                                           | `quantity` | `10Gi`  |
+| `qdrant.replicas` | Number of Qdrant replicas.                                                           | `int`      | `1`     |
+
+
 ### LLM backend
 
 | Name               | Description                                                                                                                                                                                                                                              | Type     | Value |

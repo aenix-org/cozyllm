@@ -788,7 +788,7 @@ spec:
     kind: OpenWebUI
     plural: openwebuis
     singular: open-webui
-    openAPISchema: |
+    openAPISchema: |-
       {
         "title": "Chart Values",
         "type": "object",
@@ -847,6 +847,42 @@ spec:
                 "description": "Database user Open WebUI connects as.",
                 "type": "string",
                 "default": "openwebui"
+              }
+            }
+          },
+          "qdrant": {
+            "description": "Optional Qdrant vector store.",
+            "type": "object",
+            "default": {},
+            "required": [
+              "enabled",
+              "replicas",
+              "size"
+            ],
+            "properties": {
+              "enabled": {
+                "description": "Provision a sibling Qdrant CR and point Open WebUI at it via VECTOR_DB + QDRANT_URI.",
+                "type": "boolean",
+                "default": false
+              },
+              "replicas": {
+                "description": "Number of Qdrant replicas.",
+                "type": "integer",
+                "default": 1
+              },
+              "size": {
+                "description": "Persistent Volume size for Qdrant storage.",
+                "default": "10Gi",
+                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ],
+                "x-kubernetes-int-or-string": true
               }
             }
           },

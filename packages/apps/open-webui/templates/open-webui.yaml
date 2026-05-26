@@ -16,6 +16,10 @@ spec:
   dependsOn:
     - name: postgres-{{ .Release.Name }}-db
       namespace: {{ .Release.Namespace }}
+    {{- if .Values.qdrant.enabled }}
+    - name: qdrant-{{ .Release.Name }}-vector
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
   values:
     # Bundled Ollama subchart is disabled — model serving comes from vLLM via LiteLLM.
     ollama:
@@ -44,6 +48,18 @@ spec:
           secretKeyRef:
             name: postgres-{{ .Release.Name }}-db-credentials
             key: {{ .Values.database.user }}
+      {{- if .Values.qdrant.enabled }}
+      # RAG vector store wired to a cozystack-managed Qdrant.
+      - name: VECTOR_DB
+        value: qdrant
+      - name: QDRANT_URI
+        value: "http://qdrant-{{ .Release.Name }}-vector:6333"
+      - name: QDRANT_API_KEY
+        valueFrom:
+          secretKeyRef:
+            name: qdrant-{{ .Release.Name }}-vector-apikey
+            key: api-key
+      {{- end }}
     {{- if .Values.host }}
     ingress:
       enabled: true
