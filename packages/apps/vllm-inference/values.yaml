@@ -50,6 +50,9 @@ resources:
 # Number of replica pods (1 is almost always correct — vLLM is stateful)
 replicaCount: 1
 
+# Set to false to run without GPU (CPU mode, very slow — for testing only)
+gpuEnabled: true
+
 # Shared model cache via Cozystack S3 bucket.
 # When enabled: model weights are stored in a dedicated bucket.
 # First start: download from HuggingFace → upload to bucket (slow, one-time).
