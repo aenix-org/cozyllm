@@ -10,6 +10,7 @@ spec:
     singular: vllm-inference
     openAPISchema: |
       {
+        "title": "Chart Values",
         "$schema": "http://json-schema.org/draft-07/schema#",
         "type": "object",
         "required": ["model", "gpuCount", "quantization", "maxContextLength"],
@@ -219,6 +220,7 @@ spec:
     singular: litellm
     openAPISchema: |
       {
+        "title": "Chart Values",
         "$schema": "http://json-schema.org/draft-07/schema#",
         "type": "object",
         "required": ["masterKey"],
