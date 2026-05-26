@@ -7,6 +7,7 @@ spec:
   chart:
     spec:
       chart: open-webui
+      # renovate: datasource=helm depName=open-webui registryUrl=https://helm.openwebui.com/
       version: 14.6.0
       sourceRef:
         kind: HelmRepository

@@ -7,6 +7,7 @@ spec:
   chart:
     spec:
       chart: jupyterhub
+      # renovate: datasource=helm depName=jupyterhub registryUrl=https://jupyterhub.github.io/helm-chart/
       version: 4.3.5
       sourceRef:
         kind: HelmRepository

@@ -7,6 +7,7 @@ spec:
   chart:
     spec:
       chart: langflow-ide
+      # renovate: datasource=helm depName=langflow-ide registryUrl=https://langflow-ai.github.io/langflow-helm-charts/
       version: 0.1.2
       sourceRef:
         kind: HelmRepository
