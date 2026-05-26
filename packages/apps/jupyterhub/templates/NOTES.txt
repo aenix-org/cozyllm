@@ -1,0 +1,24 @@
+JupyterHub release {{ .Release.Name }} created.
+
+First start waits for sibling Postgres CR (3-5 min), then the hub pod
+starts. Singleuser pods are created on demand when users log in.
+
+Watch progress:
+
+  kubectl -n {{ .Release.Namespace }} get helmreleases | grep {{ .Release.Name }}
+  kubectl -n {{ .Release.Namespace }} get pod -l app.kubernetes.io/instance={{ .Release.Name }}-app
+
+Access once Ready:
+
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ .Release.Name }}-app-proxy-public 8080:80
+  open http://localhost:8080
+
+Default authenticator is "dummy" — any username + password lets you in.
+Do not expose this publicly without switching to OIDC or another real
+authenticator (see docs/apps/jupyterhub.md).
+
+Common failures:
+  - hub pod CrashLoopBackOff with database errors: sibling Postgres
+    reconciliation incomplete; check postgres-{{ .Release.Name }}-db HelmRelease.
+  - Singleuser pod Pending: tenant namespace has no node with capacity for
+    the requested singleuser image (default ~1 CPU / 1 GiB).

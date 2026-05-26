@@ -1,0 +1,22 @@
+ComfyUI release {{ .Release.Name }} created.
+
+The pod requires:
+  - 1 NVIDIA GPU on the target node (gpuEnabled={{ .Values.gpuEnabled }})
+  - A bound PVC of {{ .Values.storage.size }} on storageClass {{ .Values.storageClass | default "(default)" | quote }}
+  - First image pull is ~5 GB (ghcr.io/ai-dock/comfyui:latest-cuda); allow 5-10 min.
+
+Access once Ready (no Ingress unless spec.host is set):
+
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "comfyui.fullname" . }} 8188:8188
+  open http://localhost:8188
+
+If the pod stays Pending, inspect:
+
+  kubectl -n {{ .Release.Namespace }} describe pod -l app.kubernetes.io/instance={{ .Release.Name }} | tail -30
+  kubectl -n {{ .Release.Namespace }} get pvc -l app.kubernetes.io/instance={{ .Release.Name }}
+
+Common failures:
+  - No node with available nvidia.com/gpu (the chart requests {{ .Values.gpuCount }}).
+  - PVC unbound: the chosen storageClass does not exist or has no capacity.
+  - CrashLoopBackOff during startup: the ai-dock image needs CUDA at boot.
+    Setting gpuEnabled=false in production is not supported.

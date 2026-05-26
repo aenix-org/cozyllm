@@ -23,6 +23,53 @@ spec:
           operator: Exists
           effect: NoSchedule
       {{- end }}
+      initContainers:
+        # Preflight: catch the most common operator mistakes before vLLM starts
+        # the multi-minute model download, so the pod logs surface a useful
+        # error in seconds rather than a Python traceback 5 minutes later.
+        - name: preflight
+          image: busybox:1.36
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c"]
+          args:
+            - |
+              set -u
+              echo "preflight: model={{ .Values.model }} gpuEnabled={{ .Values.gpuEnabled }} quantization={{ .Values.quantization }}"
+
+              {{- $org := index (.Values.model | splitList "/") 0 }}
+              {{- $gated := list "meta-llama" "mistralai" "microsoft" }}
+              {{- if has $org $gated }}
+              if [ -z "${HF_TOKEN:-}" ]; then
+                echo ""
+                echo "================================================================"
+                echo "FATAL: model '{{ .Values.model }}' is gated on HuggingFace and"
+                echo "       requires an access token. Set spec.huggingfaceToken in"
+                echo "       the VllmInference CR to a token with read access."
+                echo ""
+                echo "       Without it vLLM will fail to download model weights with"
+                echo "       a 401 from HuggingFace and crash-loop indefinitely."
+                echo "================================================================"
+                exit 1
+              fi
+              {{- end }}
+
+              {{- if and .Values.gpuEnabled (eq .Values.quantization "fp16") }}
+              # 7-8B models in fp16 need ~16GB VRAM; 70B+ need much more.
+              # We cannot probe VRAM from busybox, but we can warn loudly so the
+              # pod logs explain the inevitable OOM that follows.
+              echo "preflight: NOTE — fp16 at {{ .Values.maxContextLength }} ctx requires substantial GPU VRAM."
+              echo "preflight: 7-8B model -> ~16GB, 70B model -> ~160GB+, larger context multiplies KV cache."
+              {{- end }}
+
+              echo "preflight: ok"
+          env:
+            {{- if .Values.huggingfaceToken }}
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "vllm-inference.fullname" . }}-hf-token
+                  key: token
+            {{- end }}
       containers:
         - name: vllm
           image: "vllm/vllm-openai:v{{ .Chart.AppVersion }}"
