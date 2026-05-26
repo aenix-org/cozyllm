@@ -303,3 +303,129 @@ spec:
         - host
       - - spec
         - replicaCount
+---
+apiVersion: cozystack.io/v1alpha1
+kind: ApplicationDefinition
+metadata:
+  name: comfyui
+spec:
+  application:
+    kind: ComfyUI
+    plural: comfyuis
+    singular: comfyui
+    openAPISchema: |
+      {
+        "title": "Chart Values",
+        "type": "object",
+        "properties": {
+          "host": {
+            "description": "Hostname for external access via Ingress. Leave empty to skip Ingress.",
+            "type": "string",
+            "default": ""
+          },
+          "storageClass": {
+            "description": "StorageClass for the persistent volume. Leave empty to use cluster default.",
+            "type": "string",
+            "default": ""
+          },
+          "storage": {
+            "description": "Storage configuration.",
+            "type": "object",
+            "default": {},
+            "required": [
+              "size"
+            ],
+            "properties": {
+              "size": {
+                "description": "PVC size. Stable Diffusion checkpoints range from 2GB (SD 1.5) to 12GB+ (SDXL/Flux); 50Gi fits ~4-6 models plus outputs.",
+                "default": "50Gi",
+                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ],
+                "x-kubernetes-int-or-string": true
+              }
+            }
+          },
+          "gpuEnabled": {
+            "description": "Enable GPU acceleration. Set to false for CPU-only mode (very slow, for testing only).",
+            "type": "boolean",
+            "default": true
+          },
+          "gpuCount": {
+            "description": "Number of GPUs allocated to the pod.",
+            "type": "integer",
+            "default": 1
+          },
+          "resources": {
+            "description": "Resource overrides.",
+            "type": "object",
+            "default": {},
+            "required": [
+              "cpu",
+              "memory"
+            ],
+            "properties": {
+              "cpu": {
+                "description": "CPU request and limit.",
+                "type": "string",
+                "default": "4"
+              },
+              "memory": {
+                "description": "Memory request and limit.",
+                "type": "string",
+                "default": "16Gi"
+              }
+            }
+          },
+          "replicaCount": {
+            "description": "Number of ComfyUI pods. Usually 1 — ComfyUI is stateful and multiple replicas do not share workflow state.",
+            "type": "integer",
+            "default": 1
+          }
+        }
+      }
+  release:
+    chartRef:
+      kind: HelmChart
+      name: cozyllm-comfyui
+      namespace: cozy-public
+    labels:
+      cozystack.io/ui: "true"
+    prefix: comfyui-
+  dashboard:
+    category: PaaS
+    singular: "ComfyUI"
+    plural: "ComfyUI Instances"
+    description: "Self-hosted node-based UI for Stable Diffusion image generation"
+    tags:
+      - ai
+      - image-generation
+      - stable-diffusion
+      - gpu
+    icon: PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+CiAgPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHJ4PSIxNiIgZmlsbD0iIzFhMWEyZSIvPgogIDxsaW5lIHgxPSIyNSIgeTE9IjMwIiB4Mj0iNTAiIHkyPSI1MCIgc3Ryb2tlPSIjN2MzYWVkIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8bGluZSB4MT0iNzUiIHkxPSIzMCIgeDI9IjUwIiB5Mj0iNTAiIHN0cm9rZT0iIzdjM2FlZCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPGxpbmUgeDE9IjUwIiB5MT0iNTAiIHgyPSIyNSIgeTI9IjcwIiBzdHJva2U9IiM3YzNhZWQiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxsaW5lIHgxPSI1MCIgeTE9IjUwIiB4Mj0iNzUiIHkyPSI3MCIgc3Ryb2tlPSIjN2MzYWVkIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8Y2lyY2xlIGN4PSIyNSIgY3k9IjMwIiByPSI5IiBmaWxsPSIjYTc4YmZhIi8+CiAgPGNpcmNsZSBjeD0iNzUiIGN5PSIzMCIgcj0iOSIgZmlsbD0iI2E3OGJmYSIvPgogIDxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjExIiBmaWxsPSIjN2MzYWVkIi8+CiAgPGNpcmNsZSBjeD0iMjUiIGN5PSI3MCIgcj0iOSIgZmlsbD0iI2MwODRmYyIvPgogIDxjaXJjbGUgY3g9Ijc1IiBjeT0iNzAiIHI9IjkiIGZpbGw9IiNjMDg0ZmMiLz4KPC9zdmc+Cg==
+    keysOrder:
+      - - apiVersion
+      - - kind
+      - - metadata
+      - - metadata
+        - name
+      - - spec
+        - gpuEnabled
+      - - spec
+        - gpuCount
+      - - spec
+        - storage
+      - - spec
+        - resources
+      - - spec
+        - host
+      - - spec
+        - storageClass
+      - - spec
+        - replicaCount
