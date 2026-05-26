@@ -15,10 +15,16 @@ models: []
 #     apiKey: ""
 
 # PostgreSQL database for API keys, usage logs, team budgets.
-# Provisioned as a Cozystack managed Postgres instance.
+# Provisioned as a Cozystack-managed Postgres instance via the sibling
+# `Postgres` CR — credentials come from the cozystack-canonical
+# `postgres-<name>-credentials` Secret (key = `.user`).
 postgres:
   enabled: true
   replicas: 1
+  size: 5Gi
+  user: litellm
+  name: litellm
+  storageClass: ""
 
 # Ingress — expose the unified OpenAI-compatible API
 host: ""

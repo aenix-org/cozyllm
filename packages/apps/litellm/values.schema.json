@@ -51,6 +51,27 @@
           "default": 1,
           "minimum": 1,
           "maximum": 3
+        },
+        "size": {
+          "type": "string",
+          "title": "PVC size",
+          "default": "5Gi",
+          "pattern": "^[0-9]+(Mi|Gi|Ti)$"
+        },
+        "user": {
+          "type": "string",
+          "title": "DB user",
+          "default": "litellm"
+        },
+        "name": {
+          "type": "string",
+          "title": "DB name",
+          "default": "litellm"
+        },
+        "storageClass": {
+          "type": "string",
+          "title": "Storage class",
+          "description": "Leave empty to use cluster default."
         }
       }
     },

@@ -251,8 +251,12 @@ spec:
             "type": "object",
             "title": "PostgreSQL",
             "properties": {
-              "enabled":  {"type": "boolean", "title": "Enable managed Postgres", "default": true},
-              "replicas": {"type": "integer", "title": "Replicas", "default": 1, "minimum": 1, "maximum": 3}
+              "enabled":      {"type": "boolean", "title": "Enable managed Postgres", "default": true},
+              "replicas":     {"type": "integer", "title": "Replicas", "default": 1, "minimum": 1, "maximum": 3},
+              "size":         {"type": "string",  "title": "PVC size", "default": "5Gi", "pattern": "^[0-9]+(Mi|Gi|Ti)$"},
+              "user":         {"type": "string",  "title": "DB user", "default": "litellm"},
+              "name":         {"type": "string",  "title": "DB name", "default": "litellm"},
+              "storageClass": {"type": "string",  "title": "Storage class", "description": "Leave empty to use cluster default."}
             }
           },
           "host": {
