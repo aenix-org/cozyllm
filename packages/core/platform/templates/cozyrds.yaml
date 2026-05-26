@@ -653,3 +653,122 @@ spec:
         - storageClass
       - - spec
         - replicaCount
+---
+apiVersion: cozystack.io/v1alpha1
+kind: ApplicationDefinition
+metadata:
+  name: n8n
+spec:
+  application:
+    kind: N8n
+    plural: n8ns
+    singular: n8n
+    openAPISchema: |
+      {
+        "title": "Chart Values",
+        "type": "object",
+        "properties": {
+          "host": {
+            "description": "Hostname for external access via Ingress. Leave empty to skip Ingress.",
+            "type": "string",
+            "default": ""
+          },
+          "storageClass": {
+            "description": "StorageClass for the managed Postgres PVCs. Leave empty to use cluster default.",
+            "type": "string",
+            "default": ""
+          },
+          "database": {
+            "description": "PostgreSQL configuration.",
+            "type": "object",
+            "default": {},
+            "required": [
+              "name",
+              "replicas",
+              "size",
+              "user"
+            ],
+            "properties": {
+              "name": {
+                "description": "Database name n8n stores its workflows, credentials, and executions in.",
+                "type": "string",
+                "default": "n8n"
+              },
+              "password": {
+                "description": "Optional explicit password. When empty, the cozystack postgres chart generates and preserves one via lookup.",
+                "type": "string",
+                "default": ""
+              },
+              "replicas": {
+                "description": "Number of database instances.",
+                "type": "integer",
+                "default": 2
+              },
+              "size": {
+                "description": "Persistent Volume size for database storage.",
+                "default": "5Gi",
+                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ],
+                "x-kubernetes-int-or-string": true
+              },
+              "user": {
+                "description": "Database user n8n connects as.",
+                "type": "string",
+                "default": "n8n"
+              }
+            }
+          },
+          "encryptionKey": {
+            "description": "Encryption key for n8n credentials at rest. If empty, n8n generates one on first start — but that value is lost on pod recreation, breaking every stored credential. Set this explicitly in production.",
+            "type": "string",
+            "default": ""
+          },
+          "replicaCount": {
+            "description": "Number of n8n main pods. Usually 1 — multi-replica requires queue mode with sibling Redis.",
+            "type": "integer",
+            "default": 1
+          }
+        }
+      }
+  release:
+    chartRef:
+      kind: HelmChart
+      name: cozyllm-n8n
+      namespace: cozy-public
+    labels:
+      cozystack.io/ui: "true"
+    prefix: n8n-
+  dashboard:
+    category: PaaS
+    singular: "n8n"
+    plural: "n8n Instances"
+    description: "Workflow automation platform with managed Postgres"
+    tags:
+      - workflow
+      - automation
+      - low-code
+      - integration
+    icon: PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+CiAgPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHJ4PSIxNiIgZmlsbD0iIzFhMWEyZSIvPgogIDxjaXJjbGUgY3g9IjI1IiBjeT0iNTAiIHI9IjkiIGZpbGw9IiNlYTRiNzEiLz4KICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjMyIiByPSI5IiBmaWxsPSIjZWE0YjcxIi8+CiAgPGNpcmNsZSBjeD0iNTAiIGN5PSI2OCIgcj0iOSIgZmlsbD0iI2VhNGI3MSIvPgogIDxjaXJjbGUgY3g9Ijc1IiBjeT0iNTAiIHI9IjkiIGZpbGw9IiNlYTRiNzEiLz4KICA8bGluZSB4MT0iMzQiIHkxPSI1MCIgeDI9IjQxIiB5Mj0iMzIiIHN0cm9rZT0iI2VhNGI3MSIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxsaW5lIHgxPSIzNCIgeTE9IjUwIiB4Mj0iNDEiIHkyPSI2OCIgc3Ryb2tlPSIjZWE0YjcxIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPGxpbmUgeDE9IjU5IiB5MT0iMzIiIHgyPSI2NiIgeTI9IjUwIiBzdHJva2U9IiNlYTRiNzEiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8bGluZSB4MT0iNTkiIHkxPSI2OCIgeDI9IjY2IiB5Mj0iNTAiIHN0cm9rZT0iI2VhNGI3MSIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4K
+    keysOrder:
+      - - apiVersion
+      - - kind
+      - - metadata
+      - - metadata
+        - name
+      - - spec
+        - database
+      - - spec
+        - encryptionKey
+      - - spec
+        - host
+      - - spec
+        - storageClass
+      - - spec
+        - replicaCount
