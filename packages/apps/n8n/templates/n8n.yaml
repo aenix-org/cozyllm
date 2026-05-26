@@ -1,7 +1,10 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: {{ .Release.Name }}
+  # cozystack already creates an outer HelmRelease named `{{ .Release.Name }}` from
+  # the ApplicationDefinition; the wrapping HelmRelease we render here must have a
+  # different name to avoid the "patch a resource with different ownership" failure.
+  name: {{ .Release.Name }}-app
 spec:
   interval: 5m
   chart:
