@@ -82,3 +82,17 @@ spec:
     kind: GitRepository
     name: cozyllm
     namespace: cozy-public
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmChart
+metadata:
+  name: cozyllm-open-webui
+  namespace: cozy-public
+spec:
+  chart: ./packages/apps/open-webui
+  interval: 1m
+  reconcileStrategy: Revision
+  sourceRef:
+    kind: GitRepository
+    name: cozyllm
+    namespace: cozy-public
