@@ -54,3 +54,17 @@ spec:
     kind: GitRepository
     name: cozyllm
     namespace: cozy-public
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmChart
+metadata:
+  name: cozyllm-langflow
+  namespace: cozy-public
+spec:
+  chart: ./packages/apps/langflow
+  interval: 1m
+  reconcileStrategy: Revision
+  sourceRef:
+    kind: GitRepository
+    name: cozyllm
+    namespace: cozy-public

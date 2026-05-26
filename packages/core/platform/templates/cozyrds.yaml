@@ -541,3 +541,115 @@ spec:
         - storageClass
       - - spec
         - replicaCount
+---
+apiVersion: cozystack.io/v1alpha1
+kind: ApplicationDefinition
+metadata:
+  name: langflow
+spec:
+  application:
+    kind: Langflow
+    plural: langflows
+    singular: langflow
+    openAPISchema: |
+      {
+        "title": "Chart Values",
+        "type": "object",
+        "properties": {
+          "host": {
+            "description": "Hostname for external access via Ingress. Leave empty to skip Ingress.",
+            "type": "string",
+            "default": ""
+          },
+          "storageClass": {
+            "description": "StorageClass for the managed Postgres PVCs. Leave empty to use cluster default.",
+            "type": "string",
+            "default": ""
+          },
+          "database": {
+            "description": "PostgreSQL configuration.",
+            "type": "object",
+            "default": {},
+            "required": [
+              "name",
+              "replicas",
+              "size",
+              "user"
+            ],
+            "properties": {
+              "name": {
+                "description": "Database name Langflow stores its flows, users, and API keys in.",
+                "type": "string",
+                "default": "langflow"
+              },
+              "password": {
+                "description": "Optional explicit password. When empty, the cozystack postgres chart generates and preserves one via lookup.",
+                "type": "string",
+                "default": ""
+              },
+              "replicas": {
+                "description": "Number of database instances.",
+                "type": "integer",
+                "default": 2
+              },
+              "size": {
+                "description": "Persistent Volume size for database storage.",
+                "default": "5Gi",
+                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ],
+                "x-kubernetes-int-or-string": true
+              },
+              "user": {
+                "description": "Database user Langflow connects as.",
+                "type": "string",
+                "default": "langflow"
+              }
+            }
+          },
+          "replicaCount": {
+            "description": "Number of Langflow backend pods. Usually 1.",
+            "type": "integer",
+            "default": 1
+          }
+        }
+      }
+  release:
+    chartRef:
+      kind: HelmChart
+      name: cozyllm-langflow
+      namespace: cozy-public
+    labels:
+      cozystack.io/ui: "true"
+    prefix: langflow-
+  dashboard:
+    category: PaaS
+    singular: "Langflow"
+    plural: "Langflows"
+    description: "Visual workflow builder for LLM pipelines, backed by managed Postgres"
+    tags:
+      - ai
+      - llm
+      - workflow
+      - no-code
+    icon: PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+CiAgPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHJ4PSIxNiIgZmlsbD0iIzFhMWEyZSIvPgogIDxwYXRoIGQ9Ik0gMjggMzAgTCA1MCA1MCBMIDI4IDcwIiBzdHJva2U9IiMxMGI5ODEiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPHBhdGggZD0iTSA1MCA1MCBMIDcyIDMwIiBzdHJva2U9IiMxMGI5ODEiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPHBhdGggZD0iTSA1MCA1MCBMIDcyIDcwIiBzdHJva2U9IiMxMGI5ODEiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPGNpcmNsZSBjeD0iMjgiIGN5PSIzMCIgcj0iNiIgZmlsbD0iIzM0ZDM5OSIvPgogIDxjaXJjbGUgY3g9IjI4IiBjeT0iNzAiIHI9IjYiIGZpbGw9IiMzNGQzOTkiLz4KICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI4IiBmaWxsPSIjMTBiOTgxIi8+CiAgPGNpcmNsZSBjeD0iNzIiIGN5PSIzMCIgcj0iNiIgZmlsbD0iIzM0ZDM5OSIvPgogIDxjaXJjbGUgY3g9IjcyIiBjeT0iNzAiIHI9IjYiIGZpbGw9IiMzNGQzOTkiLz4KPC9zdmc+Cg==
+    keysOrder:
+      - - apiVersion
+      - - kind
+      - - metadata
+      - - metadata
+        - name
+      - - spec
+        - database
+      - - spec
+        - host
+      - - spec
+        - storageClass
+      - - spec
+        - replicaCount

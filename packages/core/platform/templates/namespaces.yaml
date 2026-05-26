@@ -19,3 +19,10 @@ metadata:
   labels:
     cozystack.io/system: "true"
   name: external-jupyterhub
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    cozystack.io/system: "true"
+  name: external-langflow
