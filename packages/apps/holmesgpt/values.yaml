@@ -1,0 +1,26 @@
+##
+## @section Common parameters
+##
+
+## @param {string} [host] - Hostname for external access via Ingress. Leave empty to skip Ingress.
+host: ""
+
+##
+## @section LLM backend
+##
+
+## @param {string} model - LiteLLM-format model identifier (e.g. openai/qwen-7b, anthropic/claude-3-5-sonnet). Must be registered in the gateway pointed to by openaiBaseUrl, or be a public OpenAI / Anthropic model when calling those APIs directly.
+model: "openai/gpt-4o"
+
+## @param {string} [openaiBaseUrl] - OpenAI-compatible API endpoint. Point this at an in-cluster LiteLLM gateway (e.g. http://litellm-<release>.cozy-litellm.svc.cluster.local:4000/v1) to keep all SRE-related LLM calls inside the cluster. Empty falls back to the public OpenAI API.
+openaiBaseUrl: ""
+
+## @param {string} [openaiApiKey] - Bearer token for the API endpoint. For LiteLLM, this is the master key. Stored as a Kubernetes Secret.
+openaiApiKey: ""
+
+##
+## @section Replication
+##
+
+## @param {int} replicaCount - Number of HolmesGPT pods.
+replicaCount: 1

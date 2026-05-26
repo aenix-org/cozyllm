@@ -12,3 +12,38 @@ metadata:
   name: cozy-litellm
   labels:
     cozystack.io/managed: "true"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    cozystack.io/system: "true"
+  name: external-jupyterhub
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    cozystack.io/system: "true"
+  name: external-langflow
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    cozystack.io/system: "true"
+  name: external-n8n
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    cozystack.io/system: "true"
+  name: external-open-webui
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    cozystack.io/system: "true"
+  name: external-holmesgpt

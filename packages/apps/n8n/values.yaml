@@ -1,0 +1,42 @@
+##
+## @section Common parameters
+##
+
+## @param {string} [host] - Hostname for external access via Ingress. Leave empty to skip Ingress.
+host: ""
+
+## @param {string} [storageClass] - StorageClass for the managed Postgres PVCs. Leave empty to use cluster default.
+storageClass: ""
+
+##
+## @section Database configuration
+##
+
+## @typedef {struct} Database - PostgreSQL configuration (managed via the cozystack `Postgres` sibling CR).
+## @field {quantity} size - Persistent Volume size for database storage.
+## @field {int} replicas - Number of database instances.
+## @field {string} user - Database user n8n connects as.
+## @field {string} name - Database name n8n stores its workflows, credentials, and executions in.
+## @field {string} [password] - Optional explicit password. When empty, the cozystack postgres chart generates and preserves one via lookup.
+
+## @param {Database} database - PostgreSQL configuration.
+database:
+  size: 5Gi
+  replicas: 2
+  user: n8n
+  name: n8n
+  password: ""
+
+##
+## @section n8n
+##
+
+## @param {string} [encryptionKey] - Encryption key for n8n credentials at rest. If empty, n8n generates one on first start — but that value is lost on pod recreation, breaking every stored credential. Set this explicitly in production.
+encryptionKey: ""
+
+##
+## @section Replication
+##
+
+## @param {int} replicaCount - Number of n8n main pods. Usually 1 — multi-replica requires queue mode with sibling Redis.
+replicaCount: 1

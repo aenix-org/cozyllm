@@ -1,0 +1,15 @@
+apiVersion: v2
+name: holmesgpt
+description: HolmesGPT — AI SRE agent for Kubernetes troubleshooting on Cozystack
+type: application
+version: 0.0.1
+appVersion: "0.30.1"
+icon: /logos/holmesgpt.svg
+keywords:
+  - ai
+  - sre
+  - troubleshooting
+  - kubernetes
+  - holmesgpt
+sources:
+  - https://github.com/robusta-dev/holmesgpt

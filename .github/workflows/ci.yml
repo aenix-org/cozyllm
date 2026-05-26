@@ -1,0 +1,44 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  lint-render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.16.4
+
+      - name: Install yq
+        run: |
+          curl -sSL https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -o /usr/local/bin/yq
+          chmod +x /usr/local/bin/yq
+
+      - name: Validate each app chart
+        run: |
+          set -e
+          for chart in packages/apps/*/; do
+            name=$(basename "$chart")
+            echo "=== $name ==="
+            helm lint "$chart"
+            helm template "ci-$name" "$chart" > /dev/null
+            jq . "$chart/values.schema.json" > /dev/null
+          done
+
+      - name: Validate platform chart
+        run: |
+          yq e '.' packages/core/platform/templates/cozyrds.yaml > /dev/null
+          yq e '.' packages/core/platform/templates/helmcharts.yaml > /dev/null
+          yq e '.' packages/core/platform/templates/helmrepositories.yaml > /dev/null
+          yq e '.' packages/core/platform/templates/namespaces.yaml > /dev/null
+          yq e '.' packages/core/platform/templates/helmreleases.yaml > /dev/null
+          helm lint packages/core/platform
+          helm template ci-platform packages/core/platform > /dev/null

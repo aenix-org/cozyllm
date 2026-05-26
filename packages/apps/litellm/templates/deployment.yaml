@@ -45,11 +45,26 @@ spec:
                   name: {{ include "litellm.fullname" . }}-master-key
                   key: key
             {{- if .Values.postgres.enabled }}
-            - name: DATABASE_URL
+            # Canonical Pattern C wiring: the `postgres-<name>-credentials`
+            # Secret keys passwords by username (see cozystack/packages/system/
+            # postgres-rd/cozyrds/postgres.yaml). The DATABASE_URL is composed
+            # via Kubernetes env-var expansion ($(VAR)) — these vars must
+            # appear above DATABASE_URL in the list. cozystack-generated
+            # passwords are alphanumeric (randAlphaNum 32), so URL-encoding
+            # is not required.
+            - name: DATABASE_USER
+              value: {{ .Values.postgres.user | quote }}
+            - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgres-{{ include "litellm.postgresName" . }}-app
-                  key: uri
+                  name: postgres-{{ include "litellm.postgresName" . }}-credentials
+                  key: {{ .Values.postgres.user }}
+            - name: DATABASE_HOST
+              value: "postgres-{{ include "litellm.postgresName" . }}-rw"
+            - name: DATABASE_NAME
+              value: {{ .Values.postgres.name | quote }}
+            - name: DATABASE_URL
+              value: "postgresql://$(DATABASE_USER):$(DATABASE_PASSWORD)@$(DATABASE_HOST):5432/$(DATABASE_NAME)"
             {{- end }}
           ports:
             - name: http
