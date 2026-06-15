@@ -13,7 +13,6 @@ External AI applications for [Cozystack](https://cozystack.io). Deploy productio
 | **[jupyterhub](docs/apps/jupyterhub.md)** | Multi-user Jupyter notebooks for ML experimentation | Postgres |
 | **[langflow](docs/apps/langflow.md)** | Visual LLM-pipeline builder | Postgres |
 | **[n8n](docs/apps/n8n.md)** | General workflow automation with native AI nodes | Postgres |
-| **[holmesgpt](docs/apps/holmesgpt.md)** | AI SRE agent for Kubernetes troubleshooting | none (k8s API) |
 
 Every app appears as a first-class entity in the Cozystack dashboard — deploy with a click, configure through a generated form, scale and tear down independently.
 
@@ -25,7 +24,7 @@ Apply the bootstrap manifest to a Cozystack 1.4+ cluster:
 kubectl apply -f https://raw.githubusercontent.com/aenix-org/cozyllm/main/init.yaml
 ```
 
-This registers a FluxCD `GitRepository` and a platform `HelmRelease` in `cozy-system`. Flux pulls every minute; within ~2 minutes you'll see eight new `ApplicationDefinition` resources in the dashboard.
+This registers a FluxCD `GitRepository` and a platform `HelmRelease` in `cozy-system`. Flux pulls every minute; within ~2 minutes you'll see seven new `ApplicationDefinition` resources in the dashboard.
 
 For pinning to a stable release rather than tracking `main`, see [docs/upgrades.md](docs/upgrades.md).
 
@@ -49,7 +48,6 @@ For the full install walkthrough including verification, troubleshooting and uni
    │ (GPU)  │◄─┤ gateway │◄─┤  Open WebUI      │
    │        │  │ +Postgr │  │  Langflow        │
    └────────┘  └─────────┘  │  n8n             │
-                            │  HolmesGPT       │
    ┌────────┐               │  JupyterHub      │
    │ComfyUI │               │  ComfyUI (GPU)   │
    │(GPU)   │               └──────────────────┘
@@ -59,7 +57,6 @@ For the full install walkthrough including verification, troubleshooting and uni
 - vLLM serves models on raw GPU hardware
 - LiteLLM unifies one-or-more vLLM endpoints (plus public OpenAI/Anthropic/etc.) behind one API
 - Front-end apps talk to LiteLLM as if it were OpenAI — single key, model registry, usage tracking
-- HolmesGPT is independent: reads cluster state via its own ServiceAccount, calls LiteLLM (or external LLM) for analysis
 - ComfyUI is independent: no LLM dependency, just GPU + Stable Diffusion
 
 ## Documentation
@@ -67,7 +64,7 @@ For the full install walkthrough including verification, troubleshooting and uni
 - **[Install guide](docs/install.md)** — detailed install + verification + uninstall
 - **[Upgrade policy](docs/upgrades.md)** — semver, ref pinning, schema migrations
 - **[Application reference](docs/apps/)** — per-app deploy options + usage
-- **[End-to-end examples](docs/examples.md)** — wiring apps together: AI stack from zero, support-triage workflow, alert root-cause, RAG over docs
+- **[End-to-end examples](docs/examples.md)** — wiring apps together: AI stack from zero, support-triage workflow, RAG over docs
 
 ## Strategy and rationale
 

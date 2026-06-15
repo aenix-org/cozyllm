@@ -51,8 +51,6 @@ Open `http://localhost:5678` → create the owner account.
 
 **Daily blog ingestion**: Schedule daily → RSS feed reader → OpenAI summarize → Telegram channel post.
 
-**Alert enrichment**: Alertmanager webhook → HTTP Request to HolmesGPT `/api/investigate` → Slack with root cause analysis.
-
 **Document sync**: GitHub webhook (push to docs repo) → HTTP Request to Open WebUI `/api/v1/documents/upload` → automatic re-indexing in Qdrant.
 
 ## Manage credentials at scale

@@ -68,13 +68,3 @@ For programmatic indexing (e.g. nightly Confluence sync), use n8n with HTTP call
 ## MCP tool integration
 
 Open WebUI 0.9+ supports MCP. **Settings → Tools → +** → add MCP server URLs (kubernetes-mcp, GitHub MCP, etc.). Enable per-chat from the tool palette under the message input.
-
-## Use as backend for HolmesGPT
-
-Treat HolmesGPT's `/api/chat` endpoint as if it were OpenAI:
-
-- In Open WebUI **Settings → Connections** add a second OpenAI API
-- URL: `http://holmesgpt-<release>-app-holmes.<ns>.svc.cluster.local/api/v1`
-- Model: arbitrary (HolmesGPT ignores it)
-
-Now switch the model dropdown to the Holmes endpoint → chat questions become cluster diagnostic queries.

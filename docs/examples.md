@@ -67,40 +67,7 @@ In n8n at `http://localhost:5678`:
 5. **Activate** workflow
 6. In WHMCS: point ticket-created webhook at the n8n URL from step 1
 
-## 4. Alertmanager root-cause analysis
-
-Goal: VictoriaMetrics alert fires → n8n receives → HolmesGPT investigates → enriched Slack message.
-
-Prerequisite: examples 1 and 3 (LiteLLM and n8n running).
-
-```bash
-echo '{"apiVersion":"apps.cozystack.io/v1alpha1","kind":"HolmesGPT","metadata":{"name":"sre"},"spec":{"model":"openai/qwen-7b","openaiBaseUrl":"http://litellm-gateway.<ns>.svc.cluster.local:4000/v1","openaiApiKey":"sk-master-CHANGEME"}}' | kubectl -n <ns> apply -f -
-```
-
-In n8n:
-
-1. **Webhook** trigger → copy URL (you'll register this as an Alertmanager receiver)
-2. → **HTTP Request** node:
-   - Method: POST
-   - URL: `http://holmesgpt-sre-app-holmes.<ns>:80/api/investigate`
-   - Body (map Alertmanager → Holmes payload):
-     ```json
-     {
-       "source":"prometheus",
-       "title":"{{ $json.alerts[0].labels.alertname }}",
-       "description":"{{ $json.alerts[0].annotations.description }}",
-       "subject":{
-         "namespace":"{{ $json.alerts[0].labels.namespace }}",
-         "name":"{{ $json.alerts[0].labels.pod }}",
-         "kind":"Pod"
-       }
-     }
-     ```
-3. → **Slack** node:
-   - Message: `"🚨 {{ $('Webhook').first().json.alerts[0].labels.alertname }}\n\n*Holmes analysis:*\n{{ $json.analysis }}"`
-4. In Alertmanager config: route alerts to the n8n webhook URL
-
-## 5. Multi-user ML notebooks
+## 4. Multi-user ML notebooks
 
 Goal: data-science team shares one JupyterHub, each user's notebooks hit the same LiteLLM gateway.
 
@@ -118,7 +85,7 @@ kubectl -n <ns> patch helmrelease jupyterhub-team-app --type merge -p '{"spec":{
 
 Users can now run `from openai import OpenAI; OpenAI().chat.completions.create(model="qwen-7b", messages=[...])` without any per-user config.
 
-## 6. Visual LLM pipelines as APIs
+## 5. Visual LLM pipelines as APIs
 
 Goal: business team designs a flow in Langflow → exports it as an HTTP endpoint → backend developers call it from production code.
 
@@ -137,7 +104,7 @@ In Langflow UI at `http://localhost:7860`:
 3. Hand the endpoint to backend devs — they call it without knowing the flow internals
 4. When the team iterates on the flow, downstream code keeps working (same endpoint, evolved logic inside)
 
-## 7. Image generation pipeline
+## 6. Image generation pipeline
 
 Goal: n8n triggers ComfyUI to generate an image, posts it back to Slack.
 

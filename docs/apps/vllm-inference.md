@@ -61,7 +61,7 @@ External access: set `spec.host` and the chart provisions an Ingress.
 
 ## Recommended: register through LiteLLM
 
-Don't connect downstream apps (Open WebUI, HolmesGPT, n8n, Langflow) directly to vLLM. Instead deploy a `LiteLLM` instance and register this vLLM as a backend — you get unified auth, virtual API keys, per-team budgets, and the ability to switch models server-side without changing every client. See [litellm.md](litellm.md).
+Don't connect downstream apps (Open WebUI, n8n, Langflow) directly to vLLM. Instead deploy a `LiteLLM` instance and register this vLLM as a backend — you get unified auth, virtual API keys, per-team budgets, and the ability to switch models server-side without changing every client. See [litellm.md](litellm.md).
 
 ## Scaling
 
