@@ -11,6 +11,6 @@ keywords:
   - gpu
   - inference
   - ai
-home: https://github.com/aenix-io/cozyllm
+home: https://github.com/aenix-org/cozyllm
 sources:
   - https://github.com/vllm-project/vllm
