@@ -4,7 +4,6 @@ description: Open WebUI — chat interface over OpenAI-compatible APIs (vLLM, Li
 type: application
 version: 0.0.1
 appVersion: "0.9.5"
-icon: /logos/open-webui.svg
 keywords:
   - ai
   - llm

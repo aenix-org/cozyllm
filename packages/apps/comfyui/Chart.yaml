@@ -4,7 +4,6 @@ description: Self-hosted node-based UI for Stable Diffusion image generation on 
 type: application
 version: 0.0.1
 appVersion: "0.3.10"
-icon: /logos/comfyui.svg
 keywords:
   - ai
   - image-generation

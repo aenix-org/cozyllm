@@ -4,7 +4,6 @@ description: Workflow automation platform on Cozystack, backed by a managed Post
 type: application
 version: 0.0.1
 appVersion: "1.122.4"
-icon: /logos/n8n.svg
 keywords:
   - workflow
   - automation

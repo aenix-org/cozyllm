@@ -4,7 +4,6 @@ description: Visual workflow builder for LLM pipelines on Cozystack, backed by a
 type: application
 version: 0.0.1
 appVersion: "latest"
-icon: /logos/langflow.svg
 keywords:
   - ai
   - llm
