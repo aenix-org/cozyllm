@@ -20,6 +20,14 @@ spec:
     - name: postgres-{{ .Release.Name }}-db
       namespace: {{ .Release.Namespace }}
   values:
+    # Multi-tenancy: the dedicated user-scheduler ships a cluster-scoped
+    # ClusterRole + ClusterRoleBinding (a copy of system:kube-scheduler) that
+    # would let any tenant read pods/nodes cluster-wide and collide on a
+    # fixed cluster-scoped name. Disable it so the hub uses the default
+    # kube-scheduler and emits only namespaced RBAC.
+    scheduling:
+      userScheduler:
+        enabled: false
     hub:
       db:
         type: postgres
