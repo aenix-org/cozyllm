@@ -9,7 +9,7 @@ disabled nothing is published — reach the UI via `kubectl port-forward`.
 {{- $cluster := .Values._cluster | default dict }}
 {{- $rootHost := index $cluster "root-host" }}
 {{- $oidcEnabled := printf "%v" (index $cluster "oidc-enabled" | default "false") }}
-{{- $oidcInsecureSkipVerify := index $cluster "oidc-insecure-skip-verify" }}
+{{- $oidcInsecureSkipVerify := printf "%v" (index $cluster "oidc-insecure-skip-verify" | default "false") }}
 {{- $keycloakInternalUrl := index $cluster "keycloak-internal-url" | default "" }}
 {{- $solver := index $cluster "solver" | default "http01" }}
 {{- $clusterIssuer := index $cluster "issuer-name" | default "letsencrypt-prod" }}

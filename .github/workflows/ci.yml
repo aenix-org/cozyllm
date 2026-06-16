@@ -62,11 +62,13 @@ jobs:
           helm template ct packages/apps/vllm-inference --set host=vllm.example.com --set apiKey=sk-test > /dev/null \
             || fail "vllm-inference rejected a valid host + apiKey"
 
-          # Gatekeeper guards must tolerate a real boolean _cluster.oidc-enabled
-          # (no "incompatible types for comparison: bool and string" panic).
+          # Gatekeeper guards must tolerate real booleans for every _cluster
+          # flag they compare (no "incompatible types for comparison: bool and
+          # string" panic) — covers oidc-enabled and oidc-insecure-skip-verify.
           for app in open-webui comfyui jupyterhub langflow; do
-            helm template ct "packages/apps/$app" --set host=x.example.com --set _cluster.oidc-enabled=true > /dev/null \
-              || fail "$app gatekeeper panics on a boolean oidc-enabled"
+            helm template ct "packages/apps/$app" --set host=x.example.com \
+              --set _cluster.oidc-enabled=true --set _cluster.oidc-insecure-skip-verify=true > /dev/null \
+              || fail "$app gatekeeper panics on a boolean _cluster flag"
           done
 
           echo "contract tests passed"
