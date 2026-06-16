@@ -16,6 +16,14 @@ External AI applications for [Cozystack](https://cozystack.io). Deploy productio
 
 Every app appears as a first-class entity in the Cozystack dashboard — deploy with a click, configure through a generated form, scale and tear down independently.
 
+### Admin components
+
+| Component | What it is |
+|---|---|
+| **[HolmesGPT](docs/holmesgpt.md)** | AI SRE agent for Kubernetes troubleshooting |
+
+HolmesGPT is **not** tenant-deployable: it needs cluster-wide read RBAC, so it is installed once by the cluster admin as an opt-in platform component (`holmesgpt.enabled: true`) rather than offered in the tenant dashboard. See [docs/holmesgpt.md](docs/holmesgpt.md).
+
 ## Quick install
 
 Apply the bootstrap manifest to a Cozystack 1.4+ cluster:
