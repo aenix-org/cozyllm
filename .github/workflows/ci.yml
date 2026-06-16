@@ -108,4 +108,25 @@ jobs:
             fail "jupyterhub wires trusted-header auth even without OIDC"
           fi
 
+          # vLLM treats only meta-llama as HF-gated; the public microsoft and
+          # mistralai curated models must not be blocked for a missing token.
+          helm template ct packages/apps/vllm-inference --set model=microsoft/Phi-4 | grep -q "is gated on HuggingFace" && fail "vllm blocks the public microsoft model" || true
+          helm template ct packages/apps/vllm-inference --set "model=mistralai/Mistral-7B-Instruct-v0.3" | grep -q "is gated on HuggingFace" && fail "vllm blocks the public mistralai model" || true
+          helm template ct packages/apps/vllm-inference --set "model=meta-llama/Llama-3.1-8B-Instruct" | grep -q "is gated on HuggingFace" || fail "vllm no longer warns for the gated meta-llama model"
+
+          # Gatekeepers must not pass the cookie secret as a CLI flag (it would
+          # leak into the process cmdline); it comes from the env var instead.
+          for app in open-webui comfyui jupyterhub langflow; do
+            g=$(helm template ct "packages/apps/$app" --set host=x.example.com --set _cluster.oidc-enabled=true)
+            echo "$g" | grep -q -- '--cookie-secret=' && fail "$app passes the cookie secret as a CLI flag" || true
+            echo "$g" | grep -q "OAUTH2_PROXY_COOKIE_SECRET" || fail "$app no longer provides the cookie secret env var"
+          done
+
+          # The resources guard must tolerate resources being set to null (the
+          # bare .Values.resources.cpu access would otherwise nil-pointer panic).
+          for app in open-webui n8n langflow jupyterhub; do
+            helm template ct "packages/apps/$app" --set resources=null > /dev/null \
+              || fail "$app nil-pointers when resources is null"
+          done
+
           echo "contract tests passed"
