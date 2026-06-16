@@ -57,11 +57,3 @@ replicaCount: 1
 
 # Set to false to run without GPU (CPU mode, very slow — for testing only)
 gpuEnabled: true
-
-# Shared model cache via Cozystack S3 bucket.
-# When enabled: model weights are stored in a dedicated bucket.
-# First start: download from HuggingFace → upload to bucket (slow, one-time).
-# Subsequent starts / new instances of same model: restore from bucket (fast).
-modelCache:
-  s3:
-    enabled: false

@@ -130,28 +130,10 @@ spec:
               }
             }
           },
-          "modelCache": {
-            "type": "object",
-            "title": "Shared model cache (S3)",
-            "description": "Cache downloaded model weights in a Cozystack-managed S3 bucket so other instances of the same model start fast and survive PVC loss.",
-            "properties": {
-              "s3": {
-                "type": "object",
-                "properties": {
-                  "enabled": {
-                    "type": "boolean",
-                    "title": "Enable shared S3 model cache",
-                    "description": "Provision a Bucket and restore/store model weights through it. First download is slow (HuggingFace → bucket); later starts restore from the bucket.",
-                    "default": false
-                  }
-                }
-              }
-            }
-          },
           "host": {
             "type": "string",
             "title": "Hostname",
-            "description": "Expose the API via Ingress at this hostname. Leave empty to skip Ingress.",
+            "description": "Expose the API via Ingress at this hostname. Requires apiKey to be set — the chart refuses to publish an unauthenticated endpoint. Leave empty to skip Ingress.",
             "pattern": "^$|^[a-z0-9][a-z0-9\\-\\.]+[a-z0-9]$"
           },
           "resources": {
@@ -229,8 +211,6 @@ spec:
         - apiKey
       - - spec
         - storage
-      - - spec
-        - modelCache
       - - spec
         - host
       - - spec

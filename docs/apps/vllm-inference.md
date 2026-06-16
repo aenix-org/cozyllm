@@ -27,7 +27,7 @@ For gated models add `"huggingfaceToken":"hf_..."`. To protect the endpoint with
 | `huggingfaceToken` | Required for gated models, stored as Kubernetes Secret |
 | `apiKey` | Optional bearer-token auth on the endpoint |
 | `storage.size` | PVC for model weights: 50Gi / 100Gi / 200Gi / 500Gi |
-| `host` | Hostname for external Ingress (otherwise cluster-internal only) |
+| `host` | Hostname for external Ingress. Requires `apiKey` to be set — the chart refuses to publish an unauthenticated endpoint. Otherwise cluster-internal only |
 | `gpuEnabled` | Set `false` for CPU-only test mode (very slow) |
 | `replicaCount` | Usually 1 — multi-replica needs N×GPU |
 
@@ -57,7 +57,7 @@ kubectl run curl --rm -it --image=curlimages/curl -- \
   -d '{"model":"Qwen/Qwen2.5-7B-Instruct","messages":[{"role":"user","content":"hi"}]}'
 ```
 
-External access: set `spec.host` and the chart provisions an Ingress.
+External access: set `spec.host` together with `spec.apiKey` and the chart provisions a TLS Ingress. Setting `host` without `apiKey` is rejected — the endpoint must not be exposed without a bearer token. Put a LiteLLM gateway in front (see below) for richer auth.
 
 ## Recommended: register through LiteLLM
 
