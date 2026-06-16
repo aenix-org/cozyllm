@@ -32,14 +32,16 @@ Adds a Pattern C `Qdrant` CR; Open WebUI gets `VECTOR_DB=qdrant`, `QDRANT_URI`, 
 | `qdrant.{enabled,size,replicas}` | Pattern C Qdrant — defaults to off (Open WebUI uses embedded ChromaDB) |
 | `openaiBaseApiUrl` | OpenAI-compatible endpoint. In-cluster LiteLLM recommended. |
 | `openaiApiKey` | Bearer token, stored as Secret |
-| `host` | Hostname for external Ingress |
+| `host` | Hostname for SSO-gated external exposure. Published only when the cluster has OIDC enabled; leave empty for cluster-internal only |
 
 Full reference: [packages/apps/open-webui/README.md](../../packages/apps/open-webui/README.md).
 
 ## Access
 
+When `host` is set and the cluster has OIDC enabled, Open WebUI is published at `https://<host>` behind an oauth2-proxy that authenticates against the platform Keycloak and admits only your tenant's groups; users are signed in automatically from their SSO identity. Without OIDC it is not published; reach it via port-forward:
+
 ```bash
-kubectl -n <ns> port-forward svc/open-webui-chat-app 3000:80
+kubectl -n <ns> port-forward svc/<release-name>-app-open-webui 3000:80
 ```
 
 Open `http://localhost:3000`. On first visit there's a setup wizard:

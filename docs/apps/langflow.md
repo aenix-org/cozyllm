@@ -13,18 +13,20 @@ echo '{"apiVersion":"apps.cozystack.io/v1alpha1","kind":"Langflow","metadata":{"
 | Field | Notes |
 |---|---|
 | `database.{size,replicas,user,name}` | Pattern C Postgres |
-| `host` | Hostname for external Ingress |
+| `host` | Hostname for SSO-gated external exposure. Published only when the cluster has OIDC enabled; leave empty for cluster-internal only |
 | `replicaCount` | Usually 1 |
 
 Full reference: [packages/apps/langflow/README.md](../../packages/apps/langflow/README.md).
 
 ## Access
 
+Langflow runs in anonymous mode (no auth of its own), so it is exposed only when `host` is set and the cluster has OIDC enabled — at `https://<host>` behind an oauth2-proxy that authenticates against the platform Keycloak and admits only your tenant's groups. Without OIDC it is not published; reach it via port-forward:
+
 ```bash
-kubectl -n <ns> port-forward svc/langflow-flows-app 7860:80
+kubectl -n <ns> port-forward svc/langflow-service 8080:8080
 ```
 
-Open `http://localhost:7860`. Default mode has no auth — Langflow operates anonymously out of the box. For production auth see the upstream docs.
+Open `http://localhost:8080`.
 
 ## Build your first flow
 
