@@ -63,8 +63,17 @@ spec:
             name: qdrant-{{ .Release.Name }}-vector-apikey
             key: api-key
       {{- end }}
-    {{- if .Values.host }}
-    ingress:
-      enabled: true
-      host: {{ .Values.host | quote }}
-    {{- end }}
+      {{- if and .Values.host (eq (index (.Values._cluster | default dict) "oidc-enabled" | default "false") "true") }}
+      # Behind the OIDC gatekeeper (templates/gatekeeper.yaml): trust the
+      # identity headers oauth2-proxy injects so users are signed in via the
+      # platform SSO instead of a second Open WebUI login.
+      - name: WEBUI_URL
+        value: "https://{{ .Values.host }}"
+      - name: WEBUI_AUTH_TRUSTED_EMAIL_HEADER
+        value: "X-Forwarded-Email"
+      - name: WEBUI_AUTH_TRUSTED_NAME_HEADER
+        value: "X-Forwarded-Preferred-Username"
+      {{- end }}
+    # Exposure (Ingress) is handled by the OIDC gatekeeper, never by the
+    # upstream chart — see templates/gatekeeper.yaml. Without OIDC the UI is
+    # reachable only via `kubectl port-forward`.
