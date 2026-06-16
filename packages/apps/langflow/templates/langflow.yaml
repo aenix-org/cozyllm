@@ -39,7 +39,7 @@ spec:
       backend:
         image:
           tag: {{ .Chart.AppVersion | quote }}
-        {{- if or .Values.resources.cpu .Values.resources.memory }}
+        {{- if and .Values.resources (or .Values.resources.cpu .Values.resources.memory) }}
         resources:
           requests:
             {{- with .Values.resources.cpu }}
