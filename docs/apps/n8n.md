@@ -19,10 +19,10 @@ openssl rand -hex 32
 ## Spec reference
 
 | Field | Notes |
-|---|---|
+| --- | --- |
 | `database.{size,replicas,user,name}` | Pattern C Postgres |
 | `encryptionKey` | 32-char string. **Set this — do not leave empty in production.** |
-| `host` | Hostname for external Ingress |
+| `host` | Hostname for external access. Published as a TLS Ingress (cert-manager); n8n's own account auth protects it. Leave empty for cluster-internal only |
 | `replicaCount` | Stay at 1 unless you've enabled queue mode |
 
 Full reference: [packages/apps/n8n/README.md](../../packages/apps/n8n/README.md).

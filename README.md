@@ -5,7 +5,7 @@ External AI applications for [Cozystack](https://cozystack.io). Deploy productio
 ## What's inside
 
 | App | What it is | Backing services |
-|---|---|---|
+| --- | --- | --- |
 | **[vllm-inference](docs/apps/vllm-inference.md)** | GPU-accelerated LLM inference (OpenAI-compatible API) | none |
 | **[litellm](docs/apps/litellm.md)** | Unified gateway in front of one or more model backends | Postgres |
 | **[open-webui](docs/apps/open-webui.md)** | Chat interface over any OpenAI-compatible API | Postgres, optional Qdrant |
@@ -19,7 +19,7 @@ Every app appears as a first-class entity in the Cozystack dashboard — deploy 
 ### Admin components
 
 | Component | What it is |
-|---|---|
+| --- | --- |
 | **[HolmesGPT](docs/holmesgpt.md)** | AI SRE agent for Kubernetes troubleshooting |
 
 HolmesGPT is **not** tenant-deployable: it needs cluster-wide read RBAC, so it is installed once by the cluster admin as an opt-in platform component (`holmesgpt.enabled: true`) rather than offered in the tenant dashboard. See [docs/holmesgpt.md](docs/holmesgpt.md).
@@ -40,7 +40,7 @@ For the full install walkthrough including verification, troubleshooting and uni
 
 ## Architecture
 
-```
+```text
 ┌──────────────────────────────────────────────────────┐
 │            Cozystack Dashboard (PaaS)                │
 │         Click → fill form → deploy CR                │

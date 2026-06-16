@@ -17,7 +17,7 @@ For testing without a GPU (very slow): set `"gpuEnabled":false`.
 ## Spec reference
 
 | Field | Notes |
-|---|---|
+| --- | --- |
 | `gpuEnabled` | `false` falls back to CPU — testing only |
 | `gpuCount` | GPUs allocated to the pod |
 | `storage.size` | PVC for models + outputs + custom nodes; SD checkpoints are 2–12GB each |

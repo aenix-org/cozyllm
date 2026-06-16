@@ -40,7 +40,7 @@ kubectl get applicationdefinitions
 
 You should see seven new entries (alongside Cozystack's built-ins):
 
-```
+```text
 NAME                  AGE
 comfyui               2m
 jupyterhub            2m
@@ -79,7 +79,7 @@ kubectl -n cozy-public patch gitrepository cozyllm --type merge \
 
 ## 4. Use the dashboard
 
-In the Cozystack UI navigate to **Marketplace → PaaS**. The eight new apps appear with brand icons and short descriptions. Click any app to open a form generated from its `openAPISchema`.
+In the Cozystack UI navigate to **Marketplace → PaaS**. The seven new apps appear with brand icons and short descriptions. Click any app to open a form generated from its `openAPISchema`.
 
 Deploy options and use cases for each app are documented in [docs/apps/](apps/).
 

@@ -11,7 +11,7 @@ echo '{"apiVersion":"apps.cozystack.io/v1alpha1","kind":"JupyterHub","metadata":
 ## Spec reference
 
 | Field | Notes |
-|---|---|
+| --- | --- |
 | `database.{size,replicas,user,name}` | Pattern C Postgres |
 | `host` | Hostname for SSO-gated external exposure. Published only when the cluster has OIDC enabled; leave empty for cluster-internal only |
 | `replicaCount` | Multi-replica needs sticky sessions; the upstream chart doesn't configure them by default — stay at 1 unless you patch the inner HelmRelease |

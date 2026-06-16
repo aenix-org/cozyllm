@@ -19,7 +19,7 @@ For gated models add `"huggingfaceToken":"hf_..."`. To protect the endpoint with
 ## Spec reference
 
 | Field | Notes |
-|---|---|
+| --- | --- |
 | `model` | One of seven presets: Llama 3.1 8B/70B, Mistral 7B, Qwen 2.5 7B/72B, DeepSeek-R1 8B, Phi-4 |
 | `gpuCount` | 1, 2, 4, 8 (tensor parallelism) |
 | `quantization` | `fp16` (best quality), `fp8`, `awq`, `gptq` — model must be pre-quantized for awq/gptq |
@@ -31,7 +31,7 @@ For gated models add `"huggingfaceToken":"hf_..."`. To protect the endpoint with
 | `gpuEnabled` | Set `false` for CPU-only test mode (very slow) |
 | `replicaCount` | Usually 1 — multi-replica needs N×GPU |
 
-Full parameter table: [packages/apps/vllm-inference/README.md](../../packages/apps/vllm-inference/README.md).
+Full parameter list with defaults: [`values.schema.json`](../../packages/apps/vllm-inference/values.schema.json).
 
 ## Wait for ready
 
