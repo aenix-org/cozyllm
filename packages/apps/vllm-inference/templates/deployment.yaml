@@ -1,3 +1,4 @@
+{{- $model := .Values.customModel | default .Values.model }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -5,7 +6,7 @@ metadata:
   labels:
     {{- include "vllm-inference.labels" . | nindent 4 }}
     cozyllm.io/model: "true"
-    cozyllm.io/model-name: {{ .Values.model | replace "/" "-" | lower | trunc 63 | trimSuffix "-" | quote }}
+    cozyllm.io/model-name: {{ $model | replace "/" "-" | lower | trunc 63 | trimSuffix "-" | quote }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -34,15 +35,15 @@ spec:
           args:
             - |
               set -u
-              echo "preflight: model={{ .Values.model }} gpuEnabled={{ .Values.gpuEnabled }} quantization={{ .Values.quantization }}"
+              echo "preflight: model={{ $model }} gpuEnabled={{ .Values.gpuEnabled }} quantization={{ .Values.quantization }}"
 
-              {{- $org := index (.Values.model | splitList "/") 0 }}
+              {{- $org := index ($model | splitList "/") 0 }}
               {{- $gated := list "meta-llama" "mistralai" "microsoft" }}
               {{- if has $org $gated }}
               if [ -z "${HF_TOKEN:-}" ]; then
                 echo ""
                 echo "================================================================"
-                echo "FATAL: model '{{ .Values.model }}' is gated on HuggingFace and"
+                echo "FATAL: model '{{ $model }}' is gated on HuggingFace and"
                 echo "       requires an access token. Set spec.huggingfaceToken in"
                 echo "       the VllmInference CR to a token with read access."
                 echo ""
@@ -76,13 +77,13 @@ spec:
           imagePullPolicy: IfNotPresent
           args:
             - "--model"
-            - {{ .Values.model | quote }}
+            - {{ $model | quote }}
             - "--tensor-parallel-size"
             - {{ .Values.gpuCount | quote }}
             - "--max-model-len"
             - {{ .Values.maxContextLength | quote }}
             - "--served-model-name"
-            - {{ .Values.model | quote }}
+            - {{ $model | quote }}
             - "--download-dir"
             - "/data/hf_cache"
             {{- if ne .Values.quantization "fp16" }}

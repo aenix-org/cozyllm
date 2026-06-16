@@ -40,6 +40,13 @@ spec:
               {"value": "microsoft/Phi-4",                           "label": "Phi-4 14B    — 1x GPU, 40GB VRAM [HF token required]"}
             ]
           },
+          "customModel": {
+            "type": "string",
+            "title": "Custom Model (advanced)",
+            "description": "Override the dropdown with any HuggingFace model ID (e.g. org/model). Leave empty to use the selected Model above. Gated models still require a HuggingFace Token.",
+            "default": "",
+            "pattern": "^$|^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$"
+          },
           "gpuCount": {
             "type": "integer",
             "title": "GPU Count",
@@ -123,6 +130,24 @@ spec:
               }
             }
           },
+          "modelCache": {
+            "type": "object",
+            "title": "Shared model cache (S3)",
+            "description": "Cache downloaded model weights in a Cozystack-managed S3 bucket so other instances of the same model start fast and survive PVC loss.",
+            "properties": {
+              "s3": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean",
+                    "title": "Enable shared S3 model cache",
+                    "description": "Provision a Bucket and restore/store model weights through it. First download is slow (HuggingFace → bucket); later starts restore from the bucket.",
+                    "default": false
+                  }
+                }
+              }
+            }
+          },
           "host": {
             "type": "string",
             "title": "Hostname",
@@ -191,6 +216,8 @@ spec:
       - - spec
         - model
       - - spec
+        - customModel
+      - - spec
         - gpuCount
       - - spec
         - quantization
@@ -202,6 +229,8 @@ spec:
         - apiKey
       - - spec
         - storage
+      - - spec
+        - modelCache
       - - spec
         - host
       - - spec
