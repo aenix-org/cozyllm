@@ -32,7 +32,7 @@ Open `http://localhost:8080`.
 
 ## Authentication
 
-External access is handled by the OIDC gatekeeper, so the hub is never reachable from outside the cluster without authenticating through Keycloak. The upstream chart's own `dummy` authenticator still applies once a request is past the gatekeeper, so within a tenant any member can pick any hub username; configure a stronger in-hub authenticator via `hub.config` on the inner HelmRelease if you need per-user separation inside the instance.
+External access is handled by the OIDC gatekeeper, so the hub is never reachable from outside the cluster without authenticating through Keycloak. When OIDC is enabled the chart also replaces the upstream `dummy` authenticator with a trusted-header authenticator that takes the hub username from the SSO identity oauth2-proxy forwards (`X-Forwarded-Preferred-Username`/`-Email`), so each tenant member gets their own hub user and home directory — no second login, no impersonation. Without OIDC (port-forward access only) the upstream `dummy` authenticator applies.
 
 ## Start a notebook
 
