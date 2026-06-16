@@ -42,6 +42,7 @@ jobs:
           yq e '.' packages/core/platform/templates/helmreleases.yaml > /dev/null
           helm lint packages/core/platform
           helm template ci-platform packages/core/platform > /dev/null
+          helm template ci-platform packages/core/platform --set holmesgpt.enabled=true --set holmesgpt.openaiApiKey=sk-test > /dev/null
 
       - name: Contract tests
         run: |
@@ -128,5 +129,13 @@ jobs:
             helm template ct "packages/apps/$app" --set resources=null > /dev/null \
               || fail "$app nil-pointers when resources is null"
           done
+
+          # HolmesGPT is an opt-in admin-only platform component: absent by
+          # default, and when enabled it installs into cozy-holmesgpt as a plain
+          # HelmRelease — never as a tenant-deployable ApplicationDefinition.
+          helm template ct packages/core/platform | grep -qi holmes && fail "holmesgpt renders while disabled" || true
+          he=$(helm template ct packages/core/platform --set holmesgpt.enabled=true --set holmesgpt.openaiApiKey=sk-test)
+          echo "$he" | yq 'select(.kind=="HelmRelease" and .metadata.name=="holmesgpt").metadata.namespace' | grep -q cozy-holmesgpt || fail "holmesgpt HelmRelease not in cozy-holmesgpt when enabled"
+          echo "$he" | yq 'select(.kind=="ApplicationDefinition").metadata.name' | grep -qi holmes && fail "holmesgpt must not be a tenant ApplicationDefinition" || true
 
           echo "contract tests passed"
