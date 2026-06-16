@@ -56,12 +56,9 @@ spec:
                 key: "{{ .Values.database.user }}"
           database:
             value: "{{ .Values.database.name }}"
-    {{- if .Values.host }}
+    # Exposure (Ingress) is handled by the OIDC gatekeeper (templates/
+    # gatekeeper.yaml), never by the upstream chart — so Langflow (which
+    # defaults to AUTO_LOGIN) is never reachable from outside the cluster
+    # without authenticating through Keycloak.
     ingress:
-      enabled: true
-      hosts:
-        - host: {{ .Values.host | quote }}
-          paths:
-            - path: /
-              pathType: Prefix
-    {{- end }}
+      enabled: false
