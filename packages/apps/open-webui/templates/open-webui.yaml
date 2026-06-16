@@ -80,7 +80,7 @@ spec:
             name: qdrant-{{ .Release.Name }}-vector-apikey
             key: api-key
       {{- end }}
-      {{- if and .Values.host (eq (index (.Values._cluster | default dict) "oidc-enabled" | default "false") "true") }}
+      {{- if and .Values.host (eq (printf "%v" (index (.Values._cluster | default dict) "oidc-enabled" | default "false")) "true") }}
       # Behind the OIDC gatekeeper (templates/gatekeeper.yaml): trust the
       # identity headers oauth2-proxy injects so users are signed in via the
       # platform SSO instead of a second Open WebUI login.

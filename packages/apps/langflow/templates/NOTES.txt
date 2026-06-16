@@ -9,7 +9,7 @@ Watch progress:
   kubectl -n {{ .Release.Namespace }} get helmreleases | grep {{ .Release.Name }}
   kubectl -n {{ .Release.Namespace }} get pod -l app.kubernetes.io/instance={{ .Release.Name }}-app
 
-{{- $oidc := eq (index (.Values._cluster | default dict) "oidc-enabled" | default "false") "true" }}
+{{- $oidc := eq (printf "%v" (index (.Values._cluster | default dict) "oidc-enabled" | default "false")) "true" }}
 {{- if and .Values.host $oidc }}
 Access at https://{{ .Values.host }} — every request is authenticated
 through the platform Keycloak SSO and restricted to your tenant's groups.

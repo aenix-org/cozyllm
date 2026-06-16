@@ -10,7 +10,7 @@ published — reach the hub via `kubectl port-forward` to proxy-public.
 */ -}}
 {{- $cluster := .Values._cluster | default dict }}
 {{- $rootHost := index $cluster "root-host" }}
-{{- $oidcEnabled := index $cluster "oidc-enabled" | default "false" }}
+{{- $oidcEnabled := printf "%v" (index $cluster "oidc-enabled" | default "false") }}
 {{- $oidcInsecureSkipVerify := index $cluster "oidc-insecure-skip-verify" }}
 {{- $keycloakInternalUrl := index $cluster "keycloak-internal-url" | default "" }}
 {{- $solver := index $cluster "solver" | default "http01" }}

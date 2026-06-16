@@ -5,7 +5,7 @@ The pod requires:
   - A bound PVC of {{ .Values.storage.size }} on storageClass {{ .Values.storageClass | default "(default)" | quote }}
   - First image pull is ~5 GB (ghcr.io/ai-dock/comfyui); allow 5-10 min.
 
-{{- $oidc := eq (index (.Values._cluster | default dict) "oidc-enabled" | default "false") "true" }}
+{{- $oidc := eq (printf "%v" (index (.Values._cluster | default dict) "oidc-enabled" | default "false")) "true" }}
 {{- if and .Values.host $oidc }}
 Access at https://{{ .Values.host }} — every request is authenticated
 through the platform Keycloak SSO and restricted to your tenant's groups.
