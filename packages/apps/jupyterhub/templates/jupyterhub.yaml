@@ -28,6 +28,19 @@ spec:
     scheduling:
       userScheduler:
         enabled: false
+    {{- if or .Values.resources.cpu .Values.resources.memory }}
+    singleuser:
+      {{- with .Values.resources.cpu }}
+      cpu:
+        limit: {{ . }}
+        guarantee: {{ . }}
+      {{- end }}
+      {{- with .Values.resources.memory }}
+      memory:
+        limit: {{ . | quote }}
+        guarantee: {{ . | quote }}
+      {{- end }}
+    {{- end }}
     hub:
       db:
         type: postgres

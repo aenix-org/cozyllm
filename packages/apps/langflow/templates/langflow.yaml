@@ -39,6 +39,23 @@ spec:
       backend:
         image:
           tag: {{ .Chart.AppVersion | quote }}
+        {{- if or .Values.resources.cpu .Values.resources.memory }}
+        resources:
+          requests:
+            {{- with .Values.resources.cpu }}
+            cpu: {{ . | quote }}
+            {{- end }}
+            {{- with .Values.resources.memory }}
+            memory: {{ . | quote }}
+            {{- end }}
+          limits:
+            {{- with .Values.resources.cpu }}
+            cpu: {{ . | quote }}
+            {{- end }}
+            {{- with .Values.resources.memory }}
+            memory: {{ . | quote }}
+            {{- end }}
+        {{- end }}
         externalDatabase:
           enabled: true
           driver:

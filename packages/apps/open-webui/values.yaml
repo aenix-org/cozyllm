@@ -53,6 +53,19 @@ openaiBaseApiUrl: ""
 openaiApiKey: ""
 
 ##
+## @section Resources
+##
+
+## @typedef {struct} Resources - CPU and memory for the Open WebUI container (each value sets both request and limit). Leave a field empty for the upstream chart default.
+## @field {string} [cpu] - CPU request and limit (e.g. 500m, 2).
+## @field {string} [memory] - Memory request and limit (e.g. 512Mi, 2Gi).
+
+## @param {Resources} [resources] - Container resources.
+resources:
+  cpu: ""
+  memory: ""
+
+##
 ## @section Replication
 ##
 

@@ -28,6 +28,19 @@ database:
   password: ""
 
 ##
+## @section Resources
+##
+
+## @typedef {struct} Resources - CPU and memory for each user's notebook server (sets the singleuser limit and guarantee). Leave a field empty for the upstream chart default.
+## @field {string} [cpu] - CPU per notebook (e.g. 1, 2).
+## @field {string} [memory] - Memory per notebook (e.g. 1Gi, 4Gi).
+
+## @param {Resources} [resources] - Per-user notebook resources.
+resources:
+  cpu: ""
+  memory: ""
+
+##
 ## @section Replication
 ##
 

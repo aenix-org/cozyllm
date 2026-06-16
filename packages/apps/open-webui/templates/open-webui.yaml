@@ -27,6 +27,23 @@ spec:
     # Bundled Ollama subchart is disabled — model serving comes from vLLM via LiteLLM.
     ollama:
       enabled: false
+    {{- if or .Values.resources.cpu .Values.resources.memory }}
+    resources:
+      requests:
+        {{- with .Values.resources.cpu }}
+        cpu: {{ . | quote }}
+        {{- end }}
+        {{- with .Values.resources.memory }}
+        memory: {{ . | quote }}
+        {{- end }}
+      limits:
+        {{- with .Values.resources.cpu }}
+        cpu: {{ . | quote }}
+        {{- end }}
+        {{- with .Values.resources.memory }}
+        memory: {{ . | quote }}
+        {{- end }}
+    {{- end }}
     {{- with .Values.openaiBaseApiUrl }}
     openaiBaseApiUrl: {{ . | quote }}
     {{- end }}
