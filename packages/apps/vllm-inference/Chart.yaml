@@ -4,7 +4,7 @@ description: Production LLM inference with vLLM — GPU-accelerated, OpenAI-comp
 type: application
 version: 0.1.1
 # renovate: datasource=docker depName=vllm/vllm-openai
-appVersion: "0.21.0"
+appVersion: "0.23.0"
 keywords:
   - llm
   - vllm
