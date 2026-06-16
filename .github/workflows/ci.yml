@@ -42,3 +42,31 @@ jobs:
           yq e '.' packages/core/platform/templates/helmreleases.yaml > /dev/null
           helm lint packages/core/platform
           helm template ci-platform packages/core/platform > /dev/null
+
+      - name: Contract tests
+        run: |
+          set -e
+          fail() { echo "CONTRACT FAIL: $1" >&2; exit 1; }
+
+          # vLLM must not ship the non-functional S3 model cache: no Bucket and
+          # no unused S3 credentials wired into the container.
+          out=$(helm template ct packages/apps/vllm-inference)
+          if echo "$out" | grep -q "kind: Bucket"; then fail "vllm-inference renders a Bucket"; fi
+          if echo "$out" | grep -qE "S3_ENDPOINT_URL|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY"; then fail "vllm-inference injects unused S3 env"; fi
+
+          # vLLM must refuse to expose an unauthenticated endpoint: host without
+          # apiKey fails, host with apiKey succeeds.
+          if helm template ct packages/apps/vllm-inference --set host=vllm.example.com > /dev/null 2>&1; then
+            fail "vllm-inference published an Ingress with host set but no apiKey"
+          fi
+          helm template ct packages/apps/vllm-inference --set host=vllm.example.com --set apiKey=sk-test > /dev/null \
+            || fail "vllm-inference rejected a valid host + apiKey"
+
+          # Gatekeeper guards must tolerate a real boolean _cluster.oidc-enabled
+          # (no "incompatible types for comparison: bool and string" panic).
+          for app in open-webui comfyui jupyterhub langflow; do
+            helm template ct "packages/apps/$app" --set host=x.example.com --set _cluster.oidc-enabled=true > /dev/null \
+              || fail "$app gatekeeper panics on a boolean oidc-enabled"
+          done
+
+          echo "contract tests passed"
