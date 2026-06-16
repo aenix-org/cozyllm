@@ -2,7 +2,7 @@ apiVersion: v2
 name: open-webui
 description: Open WebUI — chat interface over OpenAI-compatible APIs (vLLM, LiteLLM) on Cozystack
 type: application
-version: 0.0.1
+version: 0.2.0
 appVersion: "0.9.6"
 keywords:
   - ai
