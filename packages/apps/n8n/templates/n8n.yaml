@@ -25,6 +25,23 @@ spec:
     valkey:
       enabled: false
     main:
+      {{- if and .Values.resources (or .Values.resources.cpu .Values.resources.memory) }}
+      resources:
+        requests:
+          {{- with .Values.resources.cpu }}
+          cpu: {{ . | quote }}
+          {{- end }}
+          {{- with .Values.resources.memory }}
+          memory: {{ . | quote }}
+          {{- end }}
+        limits:
+          {{- with .Values.resources.cpu }}
+          cpu: {{ . | quote }}
+          {{- end }}
+          {{- with .Values.resources.memory }}
+          memory: {{ . | quote }}
+          {{- end }}
+      {{- end }}
       config:
         db:
           type: postgresdb
@@ -39,17 +56,39 @@ spec:
             secretKeyRef:
               name: postgres-{{ .Release.Name }}-db-credentials
               key: {{ .Values.database.user }}
+        {{- if .Values.host }}
+        # Behind the TLS Ingress: n8n needs its public URL so generated
+        # webhook/editor links and OAuth callbacks are correct.
+        N8N_HOST: {{ .Values.host | quote }}
+        N8N_PROTOCOL: "https"
+        N8N_SECURE_COOKIE: "true"
+        WEBHOOK_URL: {{ printf "https://%s/" .Values.host | quote }}
+        {{- end }}
       {{- with .Values.encryptionKey }}
       secret:
         n8n:
           encryption_key: {{ . | quote }}
       {{- end }}
     {{- if .Values.host }}
+    {{- $cluster := .Values._cluster | default dict }}
+    {{- $solver := index $cluster "solver" | default "http01" }}
+    {{- $clusterIssuer := index $cluster "issuer-name" | default "letsencrypt-prod" }}
+    {{- $ingressClass := index $cluster "expose-ingress" | default "tenant-root" }}
     ingress:
       enabled: true
+      className: {{ $ingressClass }}
+      annotations:
+        cert-manager.io/cluster-issuer: {{ $clusterIssuer }}
+        {{- if eq $solver "http01" }}
+        acme.cert-manager.io/http01-ingress-ingressclassname: {{ $ingressClass }}
+        {{- end }}
       hosts:
         - host: {{ .Values.host | quote }}
           paths:
             - path: /
               pathType: Prefix
+      tls:
+        - hosts:
+            - {{ .Values.host | quote }}
+          secretName: {{ .Release.Name }}-n8n-tls
     {{- end }}

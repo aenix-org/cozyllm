@@ -2,9 +2,8 @@ apiVersion: v2
 name: n8n
 description: Workflow automation platform on Cozystack, backed by a managed Postgres
 type: application
-version: 0.0.1
+version: 0.2.0
 appVersion: "1.122.4"
-icon: /logos/n8n.svg
 keywords:
   - workflow
   - automation

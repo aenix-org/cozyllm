@@ -25,7 +25,37 @@ spec:
     postgresql:
       enabled: false
     langflow:
+      # Pin the Langflow image: the upstream langflow-ide chart defaults every
+      # image tag to the floating "latest", so without this override the
+      # deployed Langflow version drifts on every pod restart. Keep this in
+      # sync with Chart.yaml appVersion.
+      global:
+        image:
+          tag: {{ .Chart.AppVersion | quote }}
+      # global.image.tag does not cascade to the frontend image, so pin it too.
+      frontend:
+        image:
+          tag: {{ .Chart.AppVersion | quote }}
       backend:
+        image:
+          tag: {{ .Chart.AppVersion | quote }}
+        {{- if and .Values.resources (or .Values.resources.cpu .Values.resources.memory) }}
+        resources:
+          requests:
+            {{- with .Values.resources.cpu }}
+            cpu: {{ . | quote }}
+            {{- end }}
+            {{- with .Values.resources.memory }}
+            memory: {{ . | quote }}
+            {{- end }}
+          limits:
+            {{- with .Values.resources.cpu }}
+            cpu: {{ . | quote }}
+            {{- end }}
+            {{- with .Values.resources.memory }}
+            memory: {{ . | quote }}
+            {{- end }}
+        {{- end }}
         externalDatabase:
           enabled: true
           driver:
@@ -43,12 +73,9 @@ spec:
                 key: "{{ .Values.database.user }}"
           database:
             value: "{{ .Values.database.name }}"
-    {{- if .Values.host }}
+    # Exposure (Ingress) is handled by the OIDC gatekeeper (templates/
+    # gatekeeper.yaml), never by the upstream chart — so Langflow (which
+    # defaults to AUTO_LOGIN) is never reachable from outside the cluster
+    # without authenticating through Keycloak.
     ingress:
-      enabled: true
-      hosts:
-        - host: {{ .Values.host | quote }}
-          paths:
-            - path: /
-              pathType: Prefix
-    {{- end }}
+      enabled: false

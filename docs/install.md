@@ -38,12 +38,11 @@ Wait ~2 minutes. Then:
 kubectl get applicationdefinitions
 ```
 
-You should see eight new entries (alongside Cozystack's built-ins):
+You should see seven new entries (alongside Cozystack's built-ins):
 
 ```
 NAME                  AGE
 comfyui               2m
-holmesgpt             2m
 jupyterhub            2m
 langflow              2m
 litellm               2m
@@ -169,7 +168,7 @@ kubectl -n cozy-public delete gitrepository cozyllm
 This removes the platform registration. **Existing app instances continue to run** — delete each CR first if you want to clean them up too:
 
 ```bash
-kubectl get vllminference,litellm,openwebui,comfyui,jupyterhub,langflow,n8n,holmesgpt -A
+kubectl get vllminference,litellm,openwebui,comfyui,jupyterhub,langflow,n8n -A
 # Then delete the ones you no longer need.
 ```
 

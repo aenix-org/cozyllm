@@ -22,7 +22,9 @@ spec:
       {{- end }}
       containers:
         - name: comfyui
-          image: "ghcr.io/ai-dock/comfyui:latest-cuda"
+          # Pinned to a concrete ai-dock release tag for reproducibility;
+          # ":latest-cuda" floats and would change on every pod restart.
+          image: "ghcr.io/ai-dock/comfyui:v2-cuda-12.1.1-base-22.04-v{{ .Chart.AppVersion }}"
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

@@ -56,7 +56,7 @@ A Pattern C Qdrant CR can be provisioned by adding `templates/qdrant.yaml` model
 
 | Name               | Description                                                                                                                                                                                                                                              | Type     | Value |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----- |
-| `openaiBaseApiUrl` | OpenAI-compatible API endpoint. Point this at a litellm gateway (e.g. http://litellm-<name>.cozy-litellm.svc.cluster.local:4000/v1) to expose every model behind that gateway as a chat option in Open WebUI. Empty falls back to the public OpenAI API. | `string` | `""`  |
+| `openaiBaseApiUrl` | OpenAI-compatible API endpoint. Point this at a litellm gateway (e.g. http://litellm-<name>.<namespace>.svc.cluster.local:4000/v1) to expose every model behind that gateway as a chat option in Open WebUI. Empty falls back to the public OpenAI API. | `string` | `""`  |
 | `openaiApiKey`     | Bearer token for the API endpoint above. For LiteLLM, this is the master key. Stored as a Kubernetes Secret.                                                                                                                                             | `string` | `""`  |
 
 

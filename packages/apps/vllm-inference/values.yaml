@@ -1,6 +1,11 @@
 # Model to deploy — determines VRAM requirements
 # Each model entry maps to an HF repo (downloaded on first start)
 model: "meta-llama/Llama-3.1-8B-Instruct"
+
+# Custom model override — any HuggingFace model ID (org/model).
+# When set, it takes precedence over `model` above. Gated models still
+# require a HuggingFace token. Leave empty to use `model`.
+customModel: ""
 # Supported values:
 #   meta-llama/Llama-3.1-8B-Instruct      (fits 1× A100 40GB with fp16)
 #   meta-llama/Llama-3.1-70B-Instruct     (fits 4× A100 40GB with fp16)
@@ -52,11 +57,3 @@ replicaCount: 1
 
 # Set to false to run without GPU (CPU mode, very slow — for testing only)
 gpuEnabled: true
-
-# Shared model cache via Cozystack S3 bucket.
-# When enabled: model weights are stored in a dedicated bucket.
-# First start: download from HuggingFace → upload to bucket (slow, one-time).
-# Subsequent starts / new instances of same model: restore from bucket (fast).
-modelCache:
-  s3:
-    enabled: false

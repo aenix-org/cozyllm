@@ -33,12 +33,19 @@ spec:
             "x-cozy-options": [
               {"value": "meta-llama/Llama-3.1-8B-Instruct",         "label": "Llama 3.1 8B  — 1x GPU, 40GB VRAM [HF token required]"},
               {"value": "meta-llama/Llama-3.1-70B-Instruct",        "label": "Llama 3.1 70B — 4x GPU, 160GB VRAM [HF token required]"},
-              {"value": "mistralai/Mistral-7B-Instruct-v0.3",       "label": "Mistral 7B   — 1x GPU, 40GB VRAM [HF token required]"},
+              {"value": "mistralai/Mistral-7B-Instruct-v0.3",       "label": "Mistral 7B   — 1x GPU, 40GB VRAM"},
               {"value": "Qwen/Qwen2.5-7B-Instruct",                 "label": "Qwen 2.5 7B  — 1x GPU, 40GB VRAM"},
               {"value": "Qwen/Qwen2.5-72B-Instruct",                "label": "Qwen 2.5 72B — 4x GPU, 160GB VRAM"},
               {"value": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B", "label": "DeepSeek-R1 8B — 1x GPU, 40GB VRAM"},
-              {"value": "microsoft/Phi-4",                           "label": "Phi-4 14B    — 1x GPU, 40GB VRAM [HF token required]"}
+              {"value": "microsoft/Phi-4",                           "label": "Phi-4 14B    — 1x GPU, 40GB VRAM"}
             ]
+          },
+          "customModel": {
+            "type": "string",
+            "title": "Custom Model (advanced)",
+            "description": "Override the dropdown with any HuggingFace model ID (e.g. org/model). Leave empty to use the selected Model above. Gated models still require a HuggingFace Token — set it up front, since the startup preflight only auto-detects the curated orgs and cannot warn early for others.",
+            "default": "",
+            "pattern": "^$|^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$"
           },
           "gpuCount": {
             "type": "integer",
@@ -126,7 +133,7 @@ spec:
           "host": {
             "type": "string",
             "title": "Hostname",
-            "description": "Expose the API via Ingress at this hostname. Leave empty to skip Ingress.",
+            "description": "Expose the API via Ingress at this hostname. Requires apiKey to be set — the chart refuses to publish an unauthenticated endpoint. Leave empty to skip Ingress.",
             "pattern": "^$|^[a-z0-9][a-z0-9\\-\\.]+[a-z0-9]$"
           },
           "resources": {
@@ -190,6 +197,8 @@ spec:
         - name
       - - spec
         - model
+      - - spec
+        - customModel
       - - spec
         - gpuCount
       - - spec
@@ -507,6 +516,15 @@ spec:
               }
             }
           },
+          "resources": {
+            "description": "CPU and memory for each user's notebook server (sets the singleuser limit and guarantee). Leave a field empty for the upstream chart default.",
+            "type": "object",
+            "default": {},
+            "properties": {
+              "cpu": {"type": "string", "title": "CPU", "default": "", "description": "CPU cores per notebook (e.g. 1, 2)."},
+              "memory": {"type": "string", "title": "Memory", "default": "", "description": "Memory per notebook (e.g. 1Gi, 4Gi)."}
+            }
+          },
           "replicaCount": {
             "description": "Number of JupyterHub hub pods. Usually 1 — multi-replica hub requires sticky sessions which the upstream chart does not configure by default.",
             "type": "integer",
@@ -545,6 +563,8 @@ spec:
         - host
       - - spec
         - storageClass
+      - - spec
+        - resources
       - - spec
         - replicaCount
 ---
@@ -619,6 +639,15 @@ spec:
               }
             }
           },
+          "resources": {
+            "description": "CPU and memory for the Langflow backend container (each value sets both request and limit). Leave a field empty for the upstream chart default.",
+            "type": "object",
+            "default": {},
+            "properties": {
+              "cpu": {"type": "string", "title": "CPU", "default": "", "description": "CPU request and limit (e.g. 500m, 2)."},
+              "memory": {"type": "string", "title": "Memory", "default": "", "description": "Memory request and limit (e.g. 512Mi, 2Gi)."}
+            }
+          },
           "replicaCount": {
             "description": "Number of Langflow backend pods. Usually 1.",
             "type": "integer",
@@ -657,6 +686,8 @@ spec:
         - host
       - - spec
         - storageClass
+      - - spec
+        - resources
       - - spec
         - replicaCount
 ---
@@ -736,6 +767,15 @@ spec:
             "type": "string",
             "default": ""
           },
+          "resources": {
+            "description": "CPU and memory for the n8n main container (each value sets both request and limit). Leave a field empty for the upstream chart default.",
+            "type": "object",
+            "default": {},
+            "properties": {
+              "cpu": {"type": "string", "title": "CPU", "default": "", "description": "CPU request and limit (e.g. 500m, 2)."},
+              "memory": {"type": "string", "title": "Memory", "default": "", "description": "Memory request and limit (e.g. 512Mi, 2Gi)."}
+            }
+          },
           "replicaCount": {
             "description": "Number of n8n main pods. Usually 1 — multi-replica requires queue mode with sibling Redis.",
             "type": "integer",
@@ -776,6 +816,8 @@ spec:
         - host
       - - spec
         - storageClass
+      - - spec
+        - resources
       - - spec
         - replicaCount
 ---
@@ -887,7 +929,7 @@ spec:
             }
           },
           "openaiBaseApiUrl": {
-            "description": "OpenAI-compatible API endpoint. Point this at a litellm gateway (e.g. http://litellm-\u003cname\u003e.cozy-litellm.svc.cluster.local:4000/v1) to expose every model behind that gateway as a chat option in Open WebUI. Empty falls back to the public OpenAI API.",
+            "description": "OpenAI-compatible API endpoint. Point this at a litellm gateway (e.g. http://litellm-\u003cname\u003e.<namespace>.svc.cluster.local:4000/v1) to expose every model behind that gateway as a chat option in Open WebUI. Empty falls back to the public OpenAI API.",
             "type": "string",
             "default": ""
           },
@@ -895,6 +937,15 @@ spec:
             "description": "Bearer token for the API endpoint above. For LiteLLM, this is the master key. Stored as a Kubernetes Secret.",
             "type": "string",
             "default": ""
+          },
+          "resources": {
+            "description": "CPU and memory for the Open WebUI container (each value sets both request and limit). Leave a field empty for the upstream chart default.",
+            "type": "object",
+            "default": {},
+            "properties": {
+              "cpu": {"type": "string", "title": "CPU", "default": "", "description": "CPU request and limit (e.g. 500m, 2)."},
+              "memory": {"type": "string", "title": "Memory", "default": "", "description": "Memory request and limit (e.g. 512Mi, 2Gi)."}
+            }
           },
           "replicaCount": {
             "description": "Number of Open WebUI pods. Usually 1.",
@@ -939,81 +990,6 @@ spec:
       - - spec
         - storageClass
       - - spec
-        - replicaCount
----
-apiVersion: cozystack.io/v1alpha1
-kind: ApplicationDefinition
-metadata:
-  name: holmesgpt
-spec:
-  application:
-    kind: HolmesGPT
-    plural: holmesgpts
-    singular: holmesgpt
-    openAPISchema: |
-      {
-        "title": "Chart Values",
-        "type": "object",
-        "properties": {
-          "host": {
-            "description": "Hostname for external access via Ingress. Leave empty to skip Ingress.",
-            "type": "string",
-            "default": ""
-          },
-          "model": {
-            "description": "LiteLLM-format model identifier (e.g. openai/qwen-7b, anthropic/claude-3-5-sonnet). Must be registered in the gateway pointed to by openaiBaseUrl, or be a public OpenAI / Anthropic model when calling those APIs directly.",
-            "type": "string",
-            "default": "openai/gpt-4o"
-          },
-          "openaiBaseUrl": {
-            "description": "OpenAI-compatible API endpoint. Point this at an in-cluster LiteLLM gateway (e.g. http://litellm-\u003crelease\u003e.cozy-litellm.svc.cluster.local:4000/v1) to keep all SRE-related LLM calls inside the cluster. Empty falls back to the public OpenAI API.",
-            "type": "string",
-            "default": ""
-          },
-          "openaiApiKey": {
-            "description": "Bearer token for the API endpoint. For LiteLLM, this is the master key. Stored as a Kubernetes Secret.",
-            "type": "string",
-            "default": ""
-          },
-          "replicaCount": {
-            "description": "Number of HolmesGPT pods.",
-            "type": "integer",
-            "default": 1
-          }
-        }
-      }
-  release:
-    chartRef:
-      kind: HelmChart
-      name: cozyllm-holmesgpt
-      namespace: cozy-public
-    labels:
-      cozystack.io/ui: "true"
-    prefix: holmesgpt-
-  dashboard:
-    category: PaaS
-    singular: "HolmesGPT"
-    plural: "HolmesGPT Agents"
-    description: "AI SRE agent for Kubernetes troubleshooting"
-    tags:
-      - ai
-      - sre
-      - troubleshooting
-      - kubernetes
-    icon: PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+CiAgPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHJ4PSIxNiIgZmlsbD0iIzFhMWEyZSIvPgogIDxjaXJjbGUgY3g9IjQyIiBjeT0iNDIiIHI9IjIwIiBmaWxsPSJub25lIiBzdHJva2U9IiNmYmJmMjQiIHN0cm9rZS13aWR0aD0iNCIvPgogIDxjaXJjbGUgY3g9IjQyIiBjeT0iNDIiIHI9IjE0IiBmaWxsPSIjMWExYTJlIi8+CiAgPGxpbmUgeDE9IjU3IiB5MT0iNTciIHgyPSI3NiIgeTI9Ijc2IiBzdHJva2U9IiNmYmJmMjQiIHN0cm9rZS13aWR0aD0iNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0iTSAzMyAzOCBMIDM2IDQxIEwgMzMgNDQiIHN0cm9rZT0iI2ZiYmYyNCIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNIDUxIDM4IEwgNDggNDEgTCA1MSA0NCIgc3Ryb2tlPSIjZmJiZjI0IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDxsaW5lIHgxPSI0MCIgeTE9IjQ5IiB4Mj0iNDQiIHkyPSI0OSIgc3Ryb2tlPSIjZmJiZjI0IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4K
-    keysOrder:
-      - - apiVersion
-      - - kind
-      - - metadata
-      - - metadata
-        - name
-      - - spec
-        - model
-      - - spec
-        - openaiBaseUrl
-      - - spec
-        - openaiApiKey
-      - - spec
-        - host
+        - resources
       - - spec
         - replicaCount

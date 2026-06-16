@@ -11,7 +11,7 @@ spec:
     spec:
       chart: open-webui
       # renovate: datasource=helm depName=open-webui registryUrl=https://helm.openwebui.com/
-      version: 14.6.0
+      version: 14.8.0
       sourceRef:
         kind: HelmRepository
         name: open-webui
@@ -24,9 +24,32 @@ spec:
       namespace: {{ .Release.Namespace }}
     {{- end }}
   values:
+    # Pin the Service name deterministically. The upstream fullname helper
+    # collapses to the release name when it already contains "open-webui"
+    # (e.g. a CR named `open-webui` → release `open-webui-app` → Service
+    # `open-webui-app`, not `...-open-webui`). The gatekeeper upstream below
+    # targets this exact name, so it must not depend on that heuristic.
+    fullnameOverride: {{ .Release.Name }}-webui
     # Bundled Ollama subchart is disabled — model serving comes from vLLM via LiteLLM.
     ollama:
       enabled: false
+    {{- if and .Values.resources (or .Values.resources.cpu .Values.resources.memory) }}
+    resources:
+      requests:
+        {{- with .Values.resources.cpu }}
+        cpu: {{ . | quote }}
+        {{- end }}
+        {{- with .Values.resources.memory }}
+        memory: {{ . | quote }}
+        {{- end }}
+      limits:
+        {{- with .Values.resources.cpu }}
+        cpu: {{ . | quote }}
+        {{- end }}
+        {{- with .Values.resources.memory }}
+        memory: {{ . | quote }}
+        {{- end }}
+    {{- end }}
     {{- with .Values.openaiBaseApiUrl }}
     openaiBaseApiUrl: {{ . | quote }}
     {{- end }}
@@ -63,8 +86,17 @@ spec:
             name: qdrant-{{ .Release.Name }}-vector-apikey
             key: api-key
       {{- end }}
-    {{- if .Values.host }}
-    ingress:
-      enabled: true
-      host: {{ .Values.host | quote }}
-    {{- end }}
+      {{- if and .Values.host (eq (printf "%v" (index (.Values._cluster | default dict) "oidc-enabled" | default "false")) "true") }}
+      # Behind the OIDC gatekeeper (templates/gatekeeper.yaml): trust the
+      # identity headers oauth2-proxy injects so users are signed in via the
+      # platform SSO instead of a second Open WebUI login.
+      - name: WEBUI_URL
+        value: "https://{{ .Values.host }}"
+      - name: WEBUI_AUTH_TRUSTED_EMAIL_HEADER
+        value: "X-Forwarded-Email"
+      - name: WEBUI_AUTH_TRUSTED_NAME_HEADER
+        value: "X-Forwarded-Preferred-Username"
+      {{- end }}
+    # Exposure (Ingress) is handled by the OIDC gatekeeper, never by the
+    # upstream chart — see templates/gatekeeper.yaml. Without OIDC the UI is
+    # reachable only via `kubectl port-forward`.

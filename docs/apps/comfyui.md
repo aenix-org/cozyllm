@@ -22,14 +22,16 @@ For testing without a GPU (very slow): set `"gpuEnabled":false`.
 | `gpuCount` | GPUs allocated to the pod |
 | `storage.size` | PVC for models + outputs + custom nodes; SD checkpoints are 2–12GB each |
 | `resources.{cpu,memory}` | Override container requests/limits |
-| `host` | Hostname for external Ingress |
+| `host` | Hostname for SSO-gated external exposure. Published only when the cluster has OIDC enabled; leave empty for cluster-internal only |
 
 Full reference: [packages/apps/comfyui/README.md](../../packages/apps/comfyui/README.md).
 
 ## Access
 
+ComfyUI ships no auth of its own, so it is exposed only when `host` is set and the cluster has OIDC enabled — at `https://<host>` behind an oauth2-proxy that authenticates against the platform Keycloak and admits only your tenant's groups. Without OIDC it is not published; reach it via port-forward:
+
 ```bash
-kubectl -n <ns> port-forward svc/comfyui-design 8188:8188
+kubectl -n <ns> port-forward svc/<release-name> 8188:8188
 ```
 
 Open `http://localhost:8188`.

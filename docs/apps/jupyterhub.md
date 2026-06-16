@@ -13,30 +13,26 @@ echo '{"apiVersion":"apps.cozystack.io/v1alpha1","kind":"JupyterHub","metadata":
 | Field | Notes |
 |---|---|
 | `database.{size,replicas,user,name}` | Pattern C Postgres |
-| `host` | Hostname for external Ingress |
+| `host` | Hostname for SSO-gated external exposure. Published only when the cluster has OIDC enabled; leave empty for cluster-internal only |
 | `replicaCount` | Multi-replica needs sticky sessions; the upstream chart doesn't configure them by default — stay at 1 unless you patch the inner HelmRelease |
 
 Full reference: [packages/apps/jupyterhub/README.md](../../packages/apps/jupyterhub/README.md).
 
 ## Access
 
+When `host` is set and the cluster has OIDC enabled, the hub is published at `https://<host>` behind an oauth2-proxy that authenticates against the platform Keycloak and admits only your tenant's groups — no extra configuration needed.
+
+Without OIDC the hub is not published; reach it via port-forward:
+
 ```bash
-kubectl -n <ns> port-forward svc/jupyterhub-hub-app-proxy-public 8080:80
+kubectl -n <ns> port-forward svc/proxy-public 8080:80
 ```
 
 Open `http://localhost:8080`.
 
-## First-time auth
+## Authentication
 
-Default authenticator is `dummy` — any username + any password lets you in. **Never expose this to the internet without changing it.**
-
-To switch to OIDC (Keycloak, GitHub, Google), override the upstream chart's `hub.config.JupyterHub.authenticator_class` via a follow-up patch. Example for Keycloak:
-
-```bash
-kubectl -n <ns> patch helmrelease jupyterhub-hub-app --type merge -p '{"spec":{"values":{"hub":{"config":{"JupyterHub":{"authenticator_class":"generic-oauth"},"GenericOAuthenticator":{"client_id":"jupyterhub","client_secret":"<secret>","oauth_callback_url":"https://<host>/hub/oauth_callback","authorize_url":"https://keycloak.../auth","token_url":"https://keycloak.../token","userdata_url":"https://keycloak.../userinfo","scope":["openid","profile","email"],"login_service":"Keycloak","username_key":"preferred_username"}}}}}}'
-```
-
-See upstream [JupyterHub auth docs](https://z2jh.jupyter.org/en/stable/administrator/authentication.html).
+External access is handled by the OIDC gatekeeper, so the hub is never reachable from outside the cluster without authenticating through Keycloak. When OIDC is enabled the chart also replaces the upstream `dummy` authenticator with a trusted-header authenticator that takes the hub username from the SSO identity oauth2-proxy forwards (`X-Forwarded-Preferred-Username`/`-Email`), so each tenant member gets their own hub user and home directory — no second login, no impersonation. Without OIDC (port-forward access only) the upstream `dummy` authenticator applies.
 
 ## Start a notebook
 

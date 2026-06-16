@@ -32,14 +32,16 @@ Adds a Pattern C `Qdrant` CR; Open WebUI gets `VECTOR_DB=qdrant`, `QDRANT_URI`, 
 | `qdrant.{enabled,size,replicas}` | Pattern C Qdrant — defaults to off (Open WebUI uses embedded ChromaDB) |
 | `openaiBaseApiUrl` | OpenAI-compatible endpoint. In-cluster LiteLLM recommended. |
 | `openaiApiKey` | Bearer token, stored as Secret |
-| `host` | Hostname for external Ingress |
+| `host` | Hostname for SSO-gated external exposure. Published only when the cluster has OIDC enabled; leave empty for cluster-internal only |
 
 Full reference: [packages/apps/open-webui/README.md](../../packages/apps/open-webui/README.md).
 
 ## Access
 
+When `host` is set and the cluster has OIDC enabled, Open WebUI is published at `https://<host>` behind an oauth2-proxy that authenticates against the platform Keycloak and admits only your tenant's groups; users are signed in automatically from their SSO identity. Without OIDC it is not published; reach it via port-forward:
+
 ```bash
-kubectl -n <ns> port-forward svc/open-webui-chat-app 3000:80
+kubectl -n <ns> port-forward svc/<release-name>-webui 3000:80
 ```
 
 Open `http://localhost:3000`. On first visit there's a setup wizard:
@@ -68,13 +70,3 @@ For programmatic indexing (e.g. nightly Confluence sync), use n8n with HTTP call
 ## MCP tool integration
 
 Open WebUI 0.9+ supports MCP. **Settings → Tools → +** → add MCP server URLs (kubernetes-mcp, GitHub MCP, etc.). Enable per-chat from the tool palette under the message input.
-
-## Use as backend for HolmesGPT
-
-Treat HolmesGPT's `/api/chat` endpoint as if it were OpenAI:
-
-- In Open WebUI **Settings → Connections** add a second OpenAI API
-- URL: `http://holmesgpt-<release>-app-holmes.<ns>.svc.cluster.local/api/v1`
-- Model: arbitrary (HolmesGPT ignores it)
-
-Now switch the model dropdown to the Holmes endpoint → chat questions become cluster diagnostic queries.
