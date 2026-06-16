@@ -85,6 +85,14 @@ jobs:
             echo "$o" | grep -q "kind: KeycloakClient" || fail "open-webui KeycloakClient not rendered with the EDP API present"
           done
 
+          # The langflow gatekeeper targets the upstream chart's static Service
+          # name (langflow-ide does not release-prefix it); pin that contract.
+          lfup=$(helm template ct packages/apps/langflow --set host=x.example.com \
+            --set _cluster.oidc-enabled=true --set-string _cluster.root-host=h --set-string _cluster.expose-ingress=tenant-root \
+            | yq 'select(.kind=="Deployment" and (.metadata.name|test("gatekeeper"))).spec.template.spec.containers[0].args[] | select(test("^--upstream"))' \
+            | sed -E 's#.*//([^.]+)\..*#\1#')
+          [ "$lfup" = "langflow-service" ] || fail "langflow gatekeeper upstream ($lfup) is not langflow-service"
+
           # n8n keeps its own auth but must publish a TLS Ingress (cert-manager +
           # ingressClass) and set its public URL when host is set.
           n=$(helm template ct packages/apps/n8n --set host=n8n.example.com --set-string _cluster.expose-ingress=tenant-root)

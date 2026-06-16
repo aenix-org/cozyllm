@@ -43,7 +43,7 @@ spec:
           "customModel": {
             "type": "string",
             "title": "Custom Model (advanced)",
-            "description": "Override the dropdown with any HuggingFace model ID (e.g. org/model). Leave empty to use the selected Model above. Gated models still require a HuggingFace Token.",
+            "description": "Override the dropdown with any HuggingFace model ID (e.g. org/model). Leave empty to use the selected Model above. Gated models still require a HuggingFace Token — set it up front, since the startup preflight only auto-detects the curated orgs and cannot warn early for others.",
             "default": "",
             "pattern": "^$|^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$"
           },
