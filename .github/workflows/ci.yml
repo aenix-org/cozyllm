@@ -71,4 +71,33 @@ jobs:
               || fail "$app gatekeeper panics on a boolean _cluster flag"
           done
 
+          # The open-webui gatekeeper must target the Service the inner chart
+          # actually creates, for any release name (the upstream fullname helper
+          # collapses when the name already contains "open-webui"). Also asserts
+          # the KeycloakClient renders when the EDP API is present.
+          for rel in open-webui ow-prod; do
+            o=$(helm template "$rel" packages/apps/open-webui --set host=x.example.com \
+              --set _cluster.oidc-enabled=true --set-string _cluster.root-host=h \
+              --set-string _cluster.expose-ingress=tenant-root --api-versions "v1.edp.epam.com/v1")
+            fno=$(echo "$o" | yq 'select(.kind=="HelmRelease").spec.values.fullnameOverride')
+            up=$(echo "$o" | yq 'select(.kind=="Deployment" and (.metadata.name|test("gatekeeper"))).spec.template.spec.containers[0].args[] | select(test("^--upstream"))' | sed -E 's#.*//([^.]+)\..*#\1#')
+            { [ -n "$fno" ] && [ "$fno" = "$up" ]; } || fail "open-webui gatekeeper upstream ($up) != Service ($fno) for release $rel"
+            echo "$o" | grep -q "kind: KeycloakClient" || fail "open-webui KeycloakClient not rendered with the EDP API present"
+          done
+
+          # n8n keeps its own auth but must publish a TLS Ingress (cert-manager +
+          # ingressClass) and set its public URL when host is set.
+          n=$(helm template ct packages/apps/n8n --set host=n8n.example.com --set-string _cluster.expose-ingress=tenant-root)
+          echo "$n" | yq 'select(.kind=="HelmRelease").spec.values.ingress.tls[0].secretName' | grep -q n8n-tls || fail "n8n Ingress has no TLS secret"
+          echo "$n" | yq 'select(.kind=="HelmRelease").spec.values.ingress.className' | grep -q tenant-root || fail "n8n Ingress has no ingressClassName"
+          echo "$n" | grep -q WEBHOOK_URL || fail "n8n does not set WEBHOOK_URL when exposed"
+
+          # JupyterHub must tie identity to SSO (trusted-header authenticator)
+          # when OIDC is on, and keep the upstream default otherwise.
+          helm template ct packages/apps/jupyterhub --set _cluster.oidc-enabled=true | grep -q "authenticator_class = _ProxyHeaderAuthenticator" \
+            || fail "jupyterhub does not wire trusted-header auth under OIDC"
+          if helm template ct packages/apps/jupyterhub | grep -q "_ProxyHeaderAuthenticator"; then
+            fail "jupyterhub wires trusted-header auth even without OIDC"
+          fi
+
           echo "contract tests passed"
