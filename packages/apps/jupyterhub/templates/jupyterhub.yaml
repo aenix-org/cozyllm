@@ -32,12 +32,11 @@ spec:
       db:
         type: postgres
         url: postgresql://{{ .Values.database.user }}@postgres-{{ .Release.Name }}-db-rw:5432/{{ .Values.database.name }}
-    {{- if .Values.host }}
+    # Exposure (Ingress) is handled by the OIDC gatekeeper (templates/
+    # gatekeeper.yaml), never by z2jh directly — so the hub is never reachable
+    # from outside the cluster without authenticating through Keycloak.
     ingress:
-      enabled: true
-      hosts:
-        - {{ .Values.host | quote }}
-    {{- end }}
+      enabled: false
   valuesFrom:
     - kind: Secret
       name: postgres-{{ .Release.Name }}-db-credentials
