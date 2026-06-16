@@ -158,7 +158,9 @@ spec:
             - --cookie-refresh=3m
             - --cookie-name=kc-access
             - --cookie-secure=true
-            - --cookie-secret=$(OAUTH2_PROXY_COOKIE_SECRET)
+            # The cookie secret is supplied via the OAUTH2_PROXY_COOKIE_SECRET
+            # env var below; passing it as a flag would leak it into the process
+            # cmdline (ps / /proc/<pid>/cmdline).
             - --skip-provider-button
             - --scope=openid email profile groups offline_access
             # Restrict to THIS tenant's Keycloak groups so users of other
