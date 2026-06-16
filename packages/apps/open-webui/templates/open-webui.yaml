@@ -24,6 +24,12 @@ spec:
       namespace: {{ .Release.Namespace }}
     {{- end }}
   values:
+    # Pin the Service name deterministically. The upstream fullname helper
+    # collapses to the release name when it already contains "open-webui"
+    # (e.g. a CR named `open-webui` → release `open-webui-app` → Service
+    # `open-webui-app`, not `...-open-webui`). The gatekeeper upstream below
+    # targets this exact name, so it must not depend on that heuristic.
+    fullnameOverride: {{ .Release.Name }}-webui
     # Bundled Ollama subchart is disabled — model serving comes from vLLM via LiteLLM.
     ollama:
       enabled: false

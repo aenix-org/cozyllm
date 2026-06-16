@@ -17,7 +17,8 @@ When OIDC is disabled we deliberately publish nothing — reach the UI with
 {{- $clusterIssuer := index $cluster "issuer-name" | default "letsencrypt-prod" }}
 {{- $ingressClass := index $cluster "expose-ingress" | default "tenant-root" }}
 {{- if and .Values.host (eq $oidcEnabled "true") }}
-{{- $upstream := printf "http://%s-app-open-webui.%s.svc:80" .Release.Name .Release.Namespace }}
+{{- /* Must match fullnameOverride set on the inner HelmRelease in open-webui.yaml. */ -}}
+{{- $upstream := printf "http://%s-webui.%s.svc:80" .Release.Name .Release.Namespace }}
 {{- /*
 Persist the client + cookie secrets across upgrades: reuse the existing
 values when the Secrets are already present, otherwise generate them.

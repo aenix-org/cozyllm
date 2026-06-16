@@ -20,7 +20,7 @@ unauthenticated chat UI must never be exposed. Reach it via port-forward:
 Access via port-forward (no host set):
 {{- end }}
 
-  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ .Release.Name }}-app-open-webui 3000:80
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ .Release.Name }}-webui 3000:80
   open http://localhost:3000
 
 On first visit, create the owner account (email + password). Subsequent
