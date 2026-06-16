@@ -21,11 +21,11 @@
       "x-cozy-options": [
         {"value": "meta-llama/Llama-3.1-8B-Instruct",              "label": "Llama 3.1 8B  — 1× GPU, 40GB VRAM [HF token required]"},
         {"value": "meta-llama/Llama-3.1-70B-Instruct",             "label": "Llama 3.1 70B — 4× GPU, 160GB VRAM [HF token required]"},
-        {"value": "mistralai/Mistral-7B-Instruct-v0.3",            "label": "Mistral 7B   — 1× GPU, 40GB VRAM [HF token required]"},
+        {"value": "mistralai/Mistral-7B-Instruct-v0.3",            "label": "Mistral 7B   — 1× GPU, 40GB VRAM"},
         {"value": "Qwen/Qwen2.5-7B-Instruct",                      "label": "Qwen 2.5 7B  — 1× GPU, 40GB VRAM"},
         {"value": "Qwen/Qwen2.5-72B-Instruct",                     "label": "Qwen 2.5 72B — 4× GPU, 160GB VRAM"},
         {"value": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",      "label": "DeepSeek-R1 8B — 1× GPU, 40GB VRAM"},
-        {"value": "microsoft/Phi-4",                                "label": "Phi-4 14B    — 1× GPU, 40GB VRAM [HF token required]"}
+        {"value": "microsoft/Phi-4",                                "label": "Phi-4 14B    — 1× GPU, 40GB VRAM"}
       ]
     },
     "customModel": {

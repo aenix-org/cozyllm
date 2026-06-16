@@ -38,7 +38,9 @@ spec:
               echo "preflight: model={{ $model }} gpuEnabled={{ .Values.gpuEnabled }} quantization={{ .Values.quantization }}"
 
               {{- $org := index ($model | splitList "/") 0 }}
-              {{- $gated := list "meta-llama" "mistralai" "microsoft" }}
+              {{- /* Only meta-llama gates its models on HuggingFace (gated=manual);
+                     mistralai/Mistral-7B-Instruct-v0.3 and microsoft/Phi-4 are public. */ -}}
+              {{- $gated := list "meta-llama" }}
               {{- if has $org $gated }}
               if [ -z "${HF_TOKEN:-}" ]; then
                 echo ""
