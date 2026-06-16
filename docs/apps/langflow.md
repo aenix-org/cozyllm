@@ -11,7 +11,7 @@ echo '{"apiVersion":"apps.cozystack.io/v1alpha1","kind":"Langflow","metadata":{"
 ## Spec reference
 
 | Field | Notes |
-|---|---|
+| --- | --- |
 | `database.{size,replicas,user,name}` | Pattern C Postgres |
 | `host` | Hostname for SSO-gated external exposure. Published only when the cluster has OIDC enabled; leave empty for cluster-internal only |
 | `replicaCount` | Usually 1 |
@@ -54,7 +54,7 @@ Use this URL from n8n, your application code, or any HTTP client.
 
 **New Flow → Templates** has ready-made RAG flows. The shape is:
 
-```
+```text
 Document Loader → Text Splitter → Embedding → Vector Store (write)
 
 User Query → Embedding → Vector Store (retrieve) → Prompt Template → OpenAI → ChatOutput

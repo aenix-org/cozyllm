@@ -13,15 +13,15 @@ The `models` array registers backends. Each entry maps a user-facing `name` (wha
 ## Spec reference
 
 | Field | Notes |
-|---|---|
+| --- | --- |
 | `masterKey` | Admin bearer key. Required. Treat as a Secret. |
 | `models[]` | Array of `{name, url, apiKey?}` registering each backend |
 | `postgres.enabled` | Required for credentials and budgets to persist |
 | `postgres.{size,replicas,user,name,storageClass}` | Standard Pattern C Postgres |
-| `host` | Hostname for external Ingress |
+| `host` | Hostname for external Ingress. Every request requires the master key, so the gateway is never unauthenticated. Leave empty for cluster-internal only |
 | `replicaCount` | LiteLLM is stateless — safe to scale |
 
-Full reference: [packages/apps/litellm/README.md](../../packages/apps/litellm/README.md).
+Full parameter list with defaults: [`values.schema.json`](../../packages/apps/litellm/values.schema.json).
 
 ## Wait for ready
 

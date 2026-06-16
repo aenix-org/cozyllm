@@ -27,7 +27,7 @@ Adds a Pattern C `Qdrant` CR; Open WebUI gets `VECTOR_DB=qdrant`, `QDRANT_URI`, 
 ## Spec reference
 
 | Field | Notes |
-|---|---|
+| --- | --- |
 | `database.{size,replicas,user,name}` | Pattern C Postgres |
 | `qdrant.{enabled,size,replicas}` | Pattern C Qdrant — defaults to off (Open WebUI uses embedded ChromaDB) |
 | `openaiBaseApiUrl` | OpenAI-compatible endpoint. In-cluster LiteLLM recommended. |

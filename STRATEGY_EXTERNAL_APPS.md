@@ -23,6 +23,7 @@
 ### Этап 1. Спецификация (✅ уже есть)
 
 Документ `cozystack.io/docs/v1.3/applications/external` определяет:
+
 - Структура репы (`init.yaml`, `packages/core/platform/`, `packages/apps/<name>/`)
 - ApplicationDefinition CRD: kind/singular/plural, openAPISchema (без `if/then/else`), chartRef к HelmChart в `cozy-public`, prefix, dashboard metadata
 - FluxCD bootstrap (GitRepository + HelmRelease)
@@ -37,6 +38,7 @@ Reference implementation: `cozystack/external-apps-example` (minecraft-server + 
 Claude Code скилл `/cozystack:external-app-create` в плагине `cozystack/ccp` — 10 фаз: парсит args, делает pre-flight, собирает app spec, резолвит deps против `packages/system/<dep>-rd/cozyrds/<dep>.yaml`, выбирает Pattern A/B/C, презентует план, генерит chart skeleton + templates, апдейтит пять platform-файлов, валидирует.
 
 Поддерживаемые dependency patterns:
+
 - **Pattern C** (рекомендуется): app chart emits `apps.cozystack.io/v1alpha1` CR (Postgres, Redis, …); cozystack reconciles it. Шарит mонiтoринг, бэкапы, миграции с tenant-инстансами этого же сервиса.
 - **Pattern A** (system-style escape hatch): in-chart operator CR (CNPG `Cluster`, Spotahome `RedisFailover`). Используется когда cozystack ApplicationDefinition недоступен или app system-scoped (harbor, keycloak).
 - **Pattern B**: external reference — пользователь сам провижнит сервис, передаёт connection details через values.
@@ -48,6 +50,7 @@ Claude Code скилл `/cozystack:external-app-create` в плагине `cozys
 Не пытаемся сразу покрыть все категории. Делаем **одну тему сильно** — AI/ML вокруг существующего CozyLLM.
 
 Roadmap:
+
 1. **vllm-inference** (✅ deployed, MVP, нужны фиксы — см. §4).
 2. **litellm** (✅ deployed, унифицированный OpenAI gateway, Pattern C Postgres).
 3. **cozy-comfyui** (планируется) — image generation, GPU, ComfyUI или Stable Diffusion WebUI.
@@ -55,6 +58,7 @@ Roadmap:
 5. **cozy-langflow** или **cozy-n8n** (планируется) — workflow-builder поверх vLLM endpoints.
 
 После 4–5 рабочих apps в одной теме станет понятно:
+
 - Где спека не покрывает реальные кейсы (GPU resource declarations, MIG-партиции, multi-namespace).
 - Какие dependency patterns ещё нужны (Kafka? ClickHouse? S3 как dep, а не как PVC?).
 - Какие boilerplate-фрагменты повторяются — кандидаты на helper templates / shared chart library.
@@ -84,7 +88,7 @@ ArtifactHub уже поддерживает custom kinds (Tekton Tasks, CoreDNS 
 
 ### Сценарий «один тенант = один AI-стек»
 
-```
+```text
 tenant-client123/
 ├── vllm-inference (Llama 3.1 70B)        ← inference backend
 ├── vllm-inference (Qwen 2.5 7B)          ← lightweight backend
@@ -184,10 +188,12 @@ tenant-client123/
 - Reference example: `https://github.com/cozystack/external-apps-example`
 - Документация: `https://cozystack.io/docs/v1.3/applications/external`
 - Установка плагина:
-  ```
+
+  ```text
   /plugin marketplace add cozystack/ccp
   /plugin install cozystack@cozystack-claude-plugins
   ```
+
 - `cozyvalues-gen` release: `https://github.com/cozystack/cozyvalues-gen/releases/latest`
 
 ---
