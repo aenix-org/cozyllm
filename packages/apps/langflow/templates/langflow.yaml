@@ -25,7 +25,20 @@ spec:
     postgresql:
       enabled: false
     langflow:
+      # Pin the Langflow image: the upstream langflow-ide chart defaults every
+      # image tag to the floating "latest", so without this override the
+      # deployed Langflow version drifts on every pod restart. Keep this in
+      # sync with Chart.yaml appVersion.
+      global:
+        image:
+          tag: {{ .Chart.AppVersion | quote }}
+      # global.image.tag does not cascade to the frontend image, so pin it too.
+      frontend:
+        image:
+          tag: {{ .Chart.AppVersion | quote }}
       backend:
+        image:
+          tag: {{ .Chart.AppVersion | quote }}
         externalDatabase:
           enabled: true
           driver:
