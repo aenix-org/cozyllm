@@ -8,10 +8,10 @@ models: []
 # Example:
 # models:
 #   - name: qwen-7b
-#     url: http://vllm-inference-qwen.cozy-vllm-inference.svc.cluster.local:8000
+#     url: http://vllm-inference-qwen.<namespace>.svc.cluster.local:8000
 #     apiKey: ""
 #   - name: deepseek-r1
-#     url: http://vllm-inference-deepseek.cozy-vllm-inference.svc.cluster.local:8000
+#     url: http://vllm-inference-deepseek.<namespace>.svc.cluster.local:8000
 #     apiKey: ""
 
 # PostgreSQL database for API keys, usage logs, team budgets.

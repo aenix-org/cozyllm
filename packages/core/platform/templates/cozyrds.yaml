@@ -916,7 +916,7 @@ spec:
             }
           },
           "openaiBaseApiUrl": {
-            "description": "OpenAI-compatible API endpoint. Point this at a litellm gateway (e.g. http://litellm-\u003cname\u003e.cozy-litellm.svc.cluster.local:4000/v1) to expose every model behind that gateway as a chat option in Open WebUI. Empty falls back to the public OpenAI API.",
+            "description": "OpenAI-compatible API endpoint. Point this at a litellm gateway (e.g. http://litellm-\u003cname\u003e.<namespace>.svc.cluster.local:4000/v1) to expose every model behind that gateway as a chat option in Open WebUI. Empty falls back to the public OpenAI API.",
             "type": "string",
             "default": ""
           },
