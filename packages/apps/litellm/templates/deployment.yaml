@@ -30,7 +30,7 @@ spec:
       {{- end }}
       containers:
         - name: litellm
-          image: "ghcr.io/berriai/litellm:main-v{{ .Chart.AppVersion }}"
+          image: "ghcr.io/berriai/litellm-database:v{{ .Chart.AppVersion }}"
           imagePullPolicy: IfNotPresent
           args:
             - "--config"

@@ -3,7 +3,7 @@ name: litellm
 description: LiteLLM — unified OpenAI-compatible gateway for multiple LLM backends
 type: application
 version: 0.1.0
-appVersion: "1.67.0"
+appVersion: "1.89.0"
 keywords:
   - llm
   - gateway
