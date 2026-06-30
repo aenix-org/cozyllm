@@ -328,7 +328,6 @@ spec:
     kind: ComfyUI
     plural: comfyuis
     singular: comfyui
-    placement: ComputePlane
     openAPISchema: |
       {
         "title": "Chart Values",
@@ -455,7 +454,6 @@ spec:
     kind: JupyterHub
     plural: jupyterhubs
     singular: jupyterhub
-    placement: ComputePlane
     openAPISchema: |
       {
         "title": "Chart Values",
@@ -579,7 +577,6 @@ spec:
     kind: Langflow
     plural: langflows
     singular: langflow
-    placement: ComputePlane
     openAPISchema: |
       {
         "title": "Chart Values",
@@ -703,7 +700,6 @@ spec:
     kind: N8n
     plural: n8ns
     singular: n8n
-    placement: ComputePlane
     openAPISchema: |
       {
         "title": "Chart Values",
@@ -834,7 +830,6 @@ spec:
     kind: OpenWebUI
     plural: openwebuis
     singular: open-webui
-    placement: ComputePlane
     openAPISchema: |-
       {
         "title": "Chart Values",

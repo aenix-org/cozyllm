@@ -7,6 +7,20 @@ metadata:
   name: {{ .Release.Name }}-app
 spec:
   interval: 5m
+  # Self-contained ComputePlane app. The bundled Postgres (postgres.yaml) is a
+  # private dependency that stays on the management cluster as part of this
+  # release; only the untrusted-code workload is routed onto the tenant's
+  # ComputePlane via the Kamaji-written admin kubeconfig. The workload reaches
+  # the management Postgres by DNS — `postgres-<release>-db-rw` resolves through
+  # the ComputePlane pods' `*.svc.cozy.local` search domain back to the tenant
+  # namespace on management — so the db host below is unchanged. createNamespace
+  # is needed because the target namespace does not exist on the ComputePlane.
+  kubeConfig:
+    secretRef:
+      name: computeplane-admin-kubeconfig
+      key: super-admin.svc
+  install:
+    createNamespace: true
   chart:
     spec:
       chart: n8n

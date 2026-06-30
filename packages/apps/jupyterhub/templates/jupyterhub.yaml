@@ -7,6 +7,16 @@ metadata:
   name: {{ .Release.Name }}-app
 spec:
   interval: 5m
+  # Self-contained ComputePlane app: only the untrusted-code workload is routed
+  # onto the tenant's ComputePlane; the bundled Postgres (postgres.yaml) stays on
+  # the management cluster and is reached by DNS (the db host below is unchanged —
+  # it resolves through the ComputePlane pods' *.svc.cozy.local search domain).
+  kubeConfig:
+    secretRef:
+      name: computeplane-admin-kubeconfig
+      key: super-admin.svc
+  install:
+    createNamespace: true
   chart:
     spec:
       chart: jupyterhub
