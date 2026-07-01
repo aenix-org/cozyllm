@@ -15,6 +15,10 @@ spec:
     secretRef:
       name: computeplane-admin-kubeconfig
       key: super-admin.svc
+  # The tenant namespace does not exist on the ComputePlane; create it there and store
+  # the Helm release in it (createNamespace alone is a no-op without targetNamespace).
+  targetNamespace: {{ .Release.Namespace }}
+  storageNamespace: {{ .Release.Namespace }}
   install:
     createNamespace: true
   chart:
@@ -26,9 +30,6 @@ spec:
         kind: HelmRepository
         name: jupyterhub
         namespace: external-jupyterhub
-  dependsOn:
-    - name: postgres-{{ .Release.Name }}-db
-      namespace: {{ .Release.Namespace }}
   values:
     # Multi-tenancy: the dedicated user-scheduler ships a cluster-scoped
     # ClusterRole + ClusterRoleBinding (a copy of system:kube-scheduler) that
@@ -82,8 +83,12 @@ spec:
     # from outside the cluster without authenticating through Keycloak.
     ingress:
       enabled: false
+  # The management helm-controller reconciles this HelmRelease, so it reads the
+  # bundled Postgres credentials Secret from the MANAGEMENT cluster and injects the
+  # password into the chart values before applying to the ComputePlane — no secret
+  # needs to exist on the ComputePlane.
   valuesFrom:
     - kind: Secret
-      name: postgres-{{ .Release.Name }}-db-credentials
-      valuesKey: {{ .Values.database.user }}
+      name: postgres-{{ .Release.Name }}-db-app
+      valuesKey: password
       targetPath: hub.db.password
