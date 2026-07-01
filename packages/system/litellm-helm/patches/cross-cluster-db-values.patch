@@ -1,0 +1,26 @@
+--- a/templates/deployment.yaml	2026-07-01 19:00:17.210906937 +0200
++++ b/templates/deployment.yaml	2026-07-01 19:00:17.305103384 +0200
+@@ -77,15 +77,23 @@
+               value: litellm
+             {{- else if .Values.db.useExisting }}
+             - name: DATABASE_USERNAME
++              {{- if .Values.db.username }}
++              value: {{ .Values.db.username | quote }}
++              {{- else }}
+               valueFrom:
+                 secretKeyRef:
+                   name: {{ .Values.db.secret.name }}
+                   key: {{ .Values.db.secret.usernameKey }}
++              {{- end }}
+             - name: DATABASE_PASSWORD
++              {{- if .Values.db.password }}
++              value: {{ .Values.db.password | quote }}
++              {{- else }}
+               valueFrom:
+                 secretKeyRef:
+                   name: {{ .Values.db.secret.name }}
+                   key: {{ .Values.db.secret.passwordKey }}
++              {{- end }}
+             - name: DATABASE_HOST
+               {{- if .Values.db.secret.endpointKey }}
+               valueFrom:
