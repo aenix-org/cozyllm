@@ -37,3 +37,14 @@ metadata:
 spec:
   interval: 5m
   url: https://helm.openwebui.com/
+---
+# oauth2-proxy — OIDC gatekeeper deployed in front of the ComputePlane workload of
+# every gated app (langflow / open-webui / jupyterhub / comfyui).
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: oauth2-proxy
+  namespace: external-oauth2-proxy
+spec:
+  interval: 5m
+  url: https://oauth2-proxy.github.io/manifests
