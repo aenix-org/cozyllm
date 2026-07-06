@@ -29,9 +29,12 @@ postgres:
 # Ingress — expose the unified OpenAI-compatible API
 host: ""
 
-# Resource limits for the LiteLLM proxy pod
+# Resource limits for the LiteLLM proxy pod.
+# memory is the request and the limit; the litellm-database image runs Prisma
+# migrations plus the Python proxy at startup and OOMs below ~1Gi, so keep the
+# default at 1Gi.
 resources:
   cpu: "500m"
-  memory: "512Mi"
+  memory: "1Gi"
 
 replicaCount: 1

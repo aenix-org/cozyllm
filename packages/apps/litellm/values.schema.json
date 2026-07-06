@@ -93,7 +93,7 @@
         "memory": {
           "type": "string",
           "title": "Memory",
-          "default": "512Mi"
+          "default": "1Gi"
         }
       }
     },
