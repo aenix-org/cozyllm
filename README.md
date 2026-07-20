@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> **This repository has moved.** Development continues in the public repositories [aenix-io/cozyllm](https://github.com/aenix-io/cozyllm) (free catalog: vLLM, LiteLLM, JupyterHub, Langflow, ComfyUI, HolmesGPT) and [aenix-io/cozyllm-nonfree](https://github.com/aenix-io/cozyllm-nonfree) (n8n, Open WebUI — non-OSS upstream licenses). This private repository is archived; its history and unmerged branches are preserved for reference only.
+
 # cozyllm
 
 External AI applications for [Cozystack](https://cozystack.io). Deploy production-ready AI infrastructure — model serving, vector storage, chat UIs, workflow automation, SRE assistance — into your Cozystack cluster through the dashboard.
